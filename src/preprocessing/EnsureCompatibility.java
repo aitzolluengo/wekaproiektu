@@ -1,2 +1,4 @@
-package preprocessing;public class EnsureCompatibility {
+package preprocessing;
+
+public class EnsureCompatibility {
 }
