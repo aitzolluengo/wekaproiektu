@@ -29,46 +29,63 @@ public class TransformData {
      * @throws Exception si ocurre un error en WEKA
      */
     public static void main(String[] args) throws Exception {
-        if (args.length < 3 || args.length > 5) {
-            System.out.println("Uso: java -jar TransformData.jar rawData.arff dictionary.txt transformed.arff [-I/--tfidf] [-N/--nonsparse]");
-            return;
+        try {
+            if (args.length < 3 || args.length > 5) {
+                System.out.println("Uso: java -jar TransformData.jar rawData.arff dictionary.txt transformed.arff [-I/--tfidf] [-N/--nonsparse]");
+                return;
+            }
+
+            // Leer el dataset ARFF de entrada
+            DataSource dataSource = new DataSource(args[0]);
+            Instances data = dataSource.getDataSet();
+            if (data.numInstances() == 0) {
+                throw new Exception("El dataset está vacío después de cargarlo.");
+            }
+            data.setClassIndex(data.numAttributes() - 1); // La clase es el último atributo
+
+            // Configurar el filtro StringToWordVector
+            StringToWordVector filter = new StringToWordVector();
+            filter.setInputFormat(data);
+            filter.setLowerCaseTokens(true);
+            filter.setTFTransform(true);  // Activa TF-IDF por defecto
+            filter.setIDFTransform(true);
+            filter.setDictionaryFileToSaveTo(new File(args[1])); // Guarda el diccionario
+            data = Filter.useFilter(data, filter);
+
+            // Verificar si se debe convertir a formato no disperso (Non-Sparse)
+            List<String> list = Arrays.asList(args);
+            if (list.contains("-N") || list.contains("--nonsparse")) {
+                SparseToNonSparse filter2 = new SparseToNonSparse();
+                filter2.setInputFormat(data);
+                data = Filter.useFilter(data, filter2);
+            }
+
+            // Reordenar atributos (pone la clase en la última posición)
+            Reorder reorder = new Reorder();
+            reorder.setAttributeIndices("2-last,1");
+            reorder.setInputFormat(data);
+            data = Filter.useFilter(data, reorder);
+
+            // Corregir nombres de atributos con caracteres especiales
+            for (int i = 0; i < data.numAttributes(); i++) {
+                String attributeName = data.attribute(i).name();
+                // Si el nombre del atributo contiene caracteres especiales, escápalo con comillas simples
+                if (attributeName.matches(".*[^a-zA-Z0-9_].*")) {
+                    data.renameAttribute(i, "'" + attributeName + "'");
+                }
+            }
+
+            // Guardar el dataset transformado
+            String outputFile = args[2];  // El archivo de salida siempre será el tercer argumento
+            ArffSaver saver = new ArffSaver();
+            saver.setInstances(data);
+            saver.setFile(new File(outputFile));
+            saver.writeBatch();
+
+            System.out.println("Transformación completada. Archivo guardado en: " + outputFile);
+        } catch (Exception e) {
+            System.err.println("Error durante la transformación: " + e.getMessage());
+            e.printStackTrace();
         }
-
-        // Leer el dataset ARFF de entrada
-        DataSource dataSource = new DataSource(args[0]);
-        Instances data = dataSource.getDataSet();
-        data.setClassIndex(data.numAttributes() - 1); // La clase es el último atributo
-
-        // Configurar el filtro StringToWordVector
-        StringToWordVector filter = new StringToWordVector();
-        filter.setInputFormat(data);
-        filter.setLowerCaseTokens(true);
-        filter.setTFTransform(true);  // Activa TF-IDF por defecto
-        filter.setIDFTransform(true);
-        filter.setDictionaryFileToSaveTo(new File(args[1])); // Guarda el diccionario
-        data = Filter.useFilter(data, filter);
-
-        // Verificar si se debe convertir a formato no disperso (Non-Sparse)
-        List<String> list = Arrays.asList(args);
-        if (list.contains("-N") || list.contains("--nonsparse")) {
-            SparseToNonSparse filter2 = new SparseToNonSparse();
-            filter2.setInputFormat(data);
-            data = Filter.useFilter(data, filter2);
-        }
-
-        // Reordenar atributos (pone la clase en la última posición)
-        Reorder reorder = new Reorder();
-        reorder.setAttributeIndices("2-last,1");
-        reorder.setInputFormat(data);
-        data = Filter.useFilter(data, reorder);
-
-        // Guardar el dataset transformado
-        String outputFile = args[2];  // El archivo de salida siempre será el tercer argumento
-        ArffSaver saver = new ArffSaver();
-        saver.setInstances(data);
-        saver.setFile(new File(outputFile));
-        saver.writeBatch();
-
-        System.out.println("Transformación completada. Archivo guardado en: " + outputFile);
     }
 }
