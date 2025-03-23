@@ -1,4 +1,5 @@
 package Sailkatzailea;
+import weka.classifiers.Evaluation;
 
 import java.io.FileWriter;
 import java.io.PrintWriter;
@@ -8,6 +9,8 @@ import weka.classifiers.functions.LinearRegression; // Cambio aquí
 import weka.classifiers.functions.MultilayerPerceptron; // Cambio aquí
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
+import weka.filters.unsupervised.instance.RemovePercentage;
+import weka.filters.Filter;
 
 /**
  * The Class ParametroenBilaketa.
@@ -21,16 +24,31 @@ public class ParametroenBilaketa {
         if (args.length == 3) { // Cambiamos a 3 argumentos
             String algoritmo = args[2]; // El tercer argumento es el algoritmo a usar
             DataSource source = new DataSource(args[0]);
-            data = source.getDataSet();
+            Instances data = source.getDataSet();
             data.setClassIndex(data.numAttributes() - 1);
             FileWriter filewriter = new FileWriter(args[1]);
             pw = new PrintWriter(filewriter);
 
+            data.randomize(new java.util.Random(1));
+
+            RemovePercentage RP = new RemovePercentage();
+            RP.setPercentage(70);
+            RP.setInputFormat(data);
+
+            RP.setInvertSelection(true);
+            Instances train = Filter.useFilter(data, RP);
+
+            RP.setInputFormat(data);
+            RP.setInvertSelection(false);
+            Instances test = Filter.useFilter(data, RP);
+
             if (algoritmo.equalsIgnoreCase("LinearRegression")) {
                 // Linear Regression
                 LinearRegression lr = new LinearRegression();
-                Evaluation eval = new Evaluation(data);
-                eval.crossValidateModel(lr, data, 10, new Random(1));
+                lr.buildClassifier(train);
+                Evaluation eval = new Evaluation(train);
+                eval.evaluateModel(lr,test);
+
 
                 pw.println("Linear Regression - Ebaluazio Metrikak:");
                 pw.println(eval.toSummaryString());
