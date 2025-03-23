@@ -1,24 +1,22 @@
-package Sailkatzailea;
+package Classifier;
 import weka.classifiers.Evaluation;
 
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.Random;
-import weka.classifiers.Evaluation;
+
 import weka.classifiers.functions.LinearRegression; // Cambio aquí
 import weka.classifiers.functions.MultilayerPerceptron; // Cambio aquí
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 import weka.filters.unsupervised.instance.RemovePercentage;
 import weka.filters.Filter;
-
 /**
  * The Class ParametroenBilaketa.
  */
 public class ParametroenBilaketa {
-
     private static PrintWriter pw;
-    private static Instances data;
+
 
     public static void main(String[] args) throws Exception {
         if (args.length == 3) { // Cambiamos a 3 argumentos
@@ -48,8 +46,7 @@ public class ParametroenBilaketa {
                 lr.buildClassifier(train);
                 Evaluation eval = new Evaluation(train);
                 eval.evaluateModel(lr,test);
-
-
+                System.out.println("aaaaa");
                 pw.println("Linear Regression - Ebaluazio Metrikak:");
                 pw.println(eval.toSummaryString());
                 pw.println(eval.toClassDetailsString());
@@ -59,8 +56,6 @@ public class ParametroenBilaketa {
                 double maximoa = 0.0;
                 String bestHiddenLayers = "";
                 double bestLearningRate = 0.0;
-                int bestTrainingTime = 0;
-
                 pw.println();
                 pw.println("MLP parametro ekorketa");
                 pw.println("3 parametro optimizatuko ditugu:");
@@ -70,31 +65,31 @@ public class ParametroenBilaketa {
                 pw.println("Ebaluazio metrika: Klase minoritarioaren fMeasure");
                 pw.println();
 
-                int i = klaseminoritarioa();
+                int i = klaseminoritarioa(data);
 
                 // Rango de valores para los parámetros
-                String[] hiddenLayersOptions = {"1", "3", "5"}; // Ejemplo de opciones
-                double[] learningRates = {0.1, 0.3, 0.5}; // Ejemplo de tasas de aprendizaje
-                int[] trainingTimes = {100, 200, 300}; // Ejemplo de épocas
+                String[] hiddenLayersOptions = {"a", "t", "i", "o", "0"}; // Ejemplo de opciones
+                double[] learningRates = {0.1, 0.3, 0.5, 0.7}; // Ejemplo de tasas de aprendizaje
 
                 for (String hiddenLayers : hiddenLayersOptions) {
                     for (double learningRate : learningRates) {
-                        for (int trainingTime : trainingTimes) {
-                            MultilayerPerceptron mlp = new MultilayerPerceptron();
-                            mlp.setHiddenLayers(hiddenLayers);
-                            mlp.setLearningRate(learningRate);
-                            mlp.setTrainingTime(trainingTime);
-
-                            Evaluation eval = new Evaluation(data);
-                            eval.crossValidateModel(mlp, data, 10, new Random(1));
+                        MultilayerPerceptron mlp = new MultilayerPerceptron();
+                        mlp.setHiddenLayers(hiddenLayers);
+                        mlp.setLearningRate(learningRate);
+                        mlp.setTrainingTime(10);
+                        System.out.println(hiddenLayers);
+                        System.out.println(learningRate);
+                        mlp.buildClassifier(train);
+                        Evaluation eval = new Evaluation(train);
+                        eval.evaluateModel(mlp,test);
 
                             if (eval.fMeasure(i) > maximoa) {
                                 maximoa = eval.fMeasure(i);
+                                System.out.println(maximoa);
                                 bestHiddenLayers = hiddenLayers;
                                 bestLearningRate = learningRate;
-                                bestTrainingTime = trainingTime;
                             }
-                        }
+
                     }
                 }
 
@@ -102,8 +97,6 @@ public class ParametroenBilaketa {
                 pw.println(bestHiddenLayers);
                 pw.println("Learning Rate hoberena:");
                 pw.println(bestLearningRate);
-                pw.println("Training Time hoberena:");
-                pw.println(bestTrainingTime);
                 pw.println("Klase minoritarioaren fMeasure hoberena:");
                 pw.println(maximoa);
             } else {
@@ -125,18 +118,19 @@ public class ParametroenBilaketa {
      * @return the int
      * @throws Exception the exception
      */
-    private static int klaseminoritarioa() throws Exception {
-        //Klase minoritarioaren indizea itzultzen du
-        pw.println(data.attribute(data.numAttributes() - 1).name() + " atributu nominala da eta hauek dira ezaugarriak:");
-        int[] counts = data.attributeStats(data.numAttributes() - 1).nominalCounts;
-        int min = 0; //Hemen klase minoritarioaren posizioa gordeko da
-        for (int j = 0; j < counts.length; j++) {
-            if (counts[min] > counts[j]) {
-                min = j;
+    private static int klaseminoritarioa(Instances data) throws Exception {
+        int minfreq=0;
+        int minclassindex=0;
+        for (int i=0; i<data.classAttribute().numValues();i++){
+            String value= data.classAttribute().value(i);
+            int freq = data.attributeStats(data.classIndex()).nominalCounts[i];
+            int min = 0; //Hemen klase minoritarioaren posizioa gordeko da
+            if (freq < minfreq) {
+                minfreq = freq;
+                minclassindex = i;
             }
-            pw.println(data.attribute(data.numAttributes() - 1).value(j) + " -> " + counts[j] + " | Maiztasuna -> " + (float) counts[j] / data.attributeStats(data.numAttributes() - 1).totalCount);
-        }
-        pw.println("Balio minimoa: " + data.attribute(data.numAttributes() - 1).value(min) + " -> " + counts[min] + "\n");
-        return min;
+            }
+            pw.println(minclassindex + "" + minfreq);
+            return minclassindex;
     }
 }
