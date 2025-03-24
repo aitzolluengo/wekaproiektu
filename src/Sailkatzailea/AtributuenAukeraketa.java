@@ -23,7 +23,7 @@ public class AtributuenAukeraketa {
             // Aplicar selección de atributos
             GainRatioAttributeEval gr = new GainRatioAttributeEval();
             Ranker ranker = new Ranker();
-            if (args.length == 4 && Integer.parseInt(args[3]) <= 300) {
+            if (args.length == 4 && Integer.parseInt(args[3]) <= 350) {
                 ranker.setNumToSelect(Integer.parseInt(args[3]));
             }
             ranker.setThreshold(0.1);
