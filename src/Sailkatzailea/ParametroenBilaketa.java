@@ -3,19 +3,22 @@ import weka.classifiers.Evaluation;
 
 import java.io.FileWriter;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Random;
 
-import weka.core.Attribute;
-import weka.core.DenseInstance;
-import weka.core.Instances;
-
+import weka.classifiers.bayes.BayesNet;
+import weka.classifiers.bayes.NaiveBayes;
+import weka.classifiers.bayes.net.estimate.SimpleEstimator;
+import weka.classifiers.bayes.net.search.SearchAlgorithm;
+import weka.classifiers.bayes.net.search.global.HillClimber;
+import weka.classifiers.bayes.net.search.global.K2;
+import weka.classifiers.bayes.net.search.global.TabuSearch;
 import weka.classifiers.functions.LinearRegression; // Cambio aquí
 import weka.classifiers.functions.MultilayerPerceptron; // Cambio aquí
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 import weka.filters.unsupervised.instance.RemovePercentage;
 import weka.filters.Filter;
+import weka.classifiers.bayes.BayesNet.*;
 /**
  * The Class ParametroenBilaketa.
  */
@@ -29,7 +32,6 @@ public class ParametroenBilaketa {
             DataSource source = new DataSource(args[0]);
             Instances data = source.getDataSet();
             data.setClassIndex(data.numAttributes() - 1);
-            data = convertirClaseNominalANumerica(data);
             FileWriter filewriter = new FileWriter(args[1]);
             pw = new PrintWriter(filewriter);
 
@@ -46,22 +48,46 @@ public class ParametroenBilaketa {
             RP.setInvertSelection(false);
             Instances test = Filter.useFilter(data, RP);
 
-            if (algoritmo.equalsIgnoreCase("LinearRegression")) {
-                // Linear Regression
-                LinearRegression lr = new LinearRegression();
-                lr.buildClassifier(train);
-                Evaluation eval = new Evaluation(train);
-                eval.evaluateModel(lr,test);
-                System.out.println("aaaaa");
-                pw.println("Linear Regression - Ebaluazio Metrikak:");
-                pw.println(eval.toSummaryString());
-                //pw.println(eval.toClassDetailsString());
-                //pw.println(eval.toMatrixString());
-            } else if (algoritmo.equalsIgnoreCase("MLP")) {
-                // Optimización de parámetros para MLP
-                double maximoa = 0.0;
-                String bestHiddenLayers = "";
-                double bestLearningRate = 0.0;
+            int i = klaseminoritarioa(data);
+
+            if (algoritmo.equalsIgnoreCase("Bayes Network")) {
+                // Bayes Network
+                SearchAlgorithm[] searchAlgorithms = {new K2(), new HillClimber(), new TabuSearch()};
+                double[] alphaValues = {0.1, 0.5, 1.0}; // Valores de suavizado para SimpleEstimator
+
+                double maxAccuracy = 0.0;
+                SearchAlgorithm bestSearchAlgorithm = null;
+                double bestAlpha = 0.1;
+
+                for (SearchAlgorithm searchAlgorithm : searchAlgorithms) {
+                    for (double alpha : alphaValues) {
+                        BayesNet bnTemp = new BayesNet();
+                        bnTemp.setSearchAlgorithm(searchAlgorithm);
+
+                        // Crear el estimador y establecer su alpha
+                        SimpleEstimator estimator = new SimpleEstimator();
+                        estimator.setAlpha(alpha);  // Aquí se usa setAlpha() en lugar de pasar un double directamente
+                        bnTemp.setEstimator(estimator);
+
+                        bnTemp.buildClassifier(train);
+                        Evaluation eval = new Evaluation(train);
+                        eval.evaluateModel(bnTemp, test);
+
+                        if (eval.fMeasure(1) > maxAccuracy) {
+                            maxAccuracy = eval.fMeasure(1);
+                            bestSearchAlgorithm = searchAlgorithm;
+                            bestAlpha = alpha;
+                        }
+                    }
+                }
+
+                System.out.println("Best SearchAlgorithm: " + bestSearchAlgorithm.getClass().getSimpleName());
+                System.out.println("Best Alpha: " + bestAlpha);
+                System.out.println("Max Accuracy: " + maxAccuracy);
+
+            } else if (algoritmo.equalsIgnoreCase("Naive Bayes")) {
+                // Optimización de parámetros para Naive Bayes
+
                 pw.println();
                 pw.println("MLP parametro ekorketa");
                 pw.println("3 parametro optimizatuko ditugu:");
@@ -71,40 +97,37 @@ public class ParametroenBilaketa {
                 pw.println("Ebaluazio metrika: Klase minoritarioaren fMeasure");
                 pw.println();
 
-                int i = klaseminoritarioa(data);
 
-                // Rango de valores para los parámetros
-                String[] hiddenLayersOptions = {"a", "t", "i", "o", "0"}; // Ejemplo de opciones
-                double[] learningRates = {0.1, 0.3, 0.5, 0.7}; // Ejemplo de tasas de aprendizaje
+                boolean[] kernelEstimatorOptions = {true, false};
+                boolean[] discretizationOptions = {true, false};
 
-                for (String hiddenLayers : hiddenLayersOptions) {
-                    for (double learningRate : learningRates) {
-                        MultilayerPerceptron mlp = new MultilayerPerceptron();
-                        mlp.setHiddenLayers(hiddenLayers);
-                        mlp.setLearningRate(learningRate);
-                        mlp.setTrainingTime(10);
-                        System.out.println(hiddenLayers);
-                        System.out.println(learningRate);
-                        mlp.buildClassifier(train);
+                double maxAccuracy = 0.0;
+                boolean bestKernelEstimator = false;
+                boolean bestDiscretization = false;
+
+                for (boolean useKernelEstimator : kernelEstimatorOptions) {
+                    for (boolean useDiscretization : discretizationOptions) {
+                        NaiveBayes nb = new NaiveBayes();
+                        nb.setUseKernelEstimator(useKernelEstimator);
+                        nb.setUseSupervisedDiscretization(useDiscretization);
+
+                        nb.buildClassifier(train);
                         Evaluation eval = new Evaluation(train);
-                        eval.evaluateModel(mlp,test);
+                        eval.evaluateModel(nb, test);
 
-                        if (eval.fMeasure(i) > maximoa) {
-                            maximoa = eval.fMeasure(i);
-                            System.out.println(maximoa);
-                            bestHiddenLayers = hiddenLayers;
-                            bestLearningRate = learningRate;
+                        if (eval.fMeasure(i) > maxAccuracy) {
+                            maxAccuracy = eval.fMeasure(i);
+                            bestKernelEstimator = useKernelEstimator;
+                            bestDiscretization = useDiscretization;
                         }
-
                     }
                 }
 
-                pw.println("Hidden Layers hoberena:");
-                pw.println(bestHiddenLayers);
-                pw.println("Learning Rate hoberena:");
-                pw.println(bestLearningRate);
-                pw.println("Klase minoritarioaren fMeasure hoberena:");
-                pw.println(maximoa);
+                pw.println("Best KernelEstimator: " + bestKernelEstimator);
+                pw.println("Best Discretization: " + bestDiscretization);
+                pw.println("Max Accuracy: " + maxAccuracy);
+
+
             } else {
                 System.out.println("Algoritmo no válido. Usa 'LinearRegression' o 'MLP'.");
                 return;
@@ -125,7 +148,7 @@ public class ParametroenBilaketa {
      * @throws Exception the exception
      */
     private static int klaseminoritarioa(Instances data) throws Exception {
-        int minfreq=Integer.MAX_VALUE;
+        int minfreq=0;
         int minclassindex=0;
         for (int i=0; i<data.classAttribute().numValues();i++){
             String value= data.classAttribute().value(i);
@@ -135,11 +158,11 @@ public class ParametroenBilaketa {
                 minfreq = freq;
                 minclassindex = i;
             }
-        }
-        pw.println(minclassindex + "" + minfreq);
-        return minclassindex;
+            }
+            pw.println(minclassindex + "" + minfreq);
+            return minclassindex;
     }
-
+}
     public static Instances convertirClaseNominalANumerica(Instances data) throws Exception {
         // Crear nueva estructura sin la clase nominal original
         ArrayList<Attribute> atributos = new ArrayList<>();
