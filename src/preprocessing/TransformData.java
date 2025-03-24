@@ -35,6 +35,9 @@ public class TransformData {
                 return;
             }
 
+            List<String> list = Arrays.asList(args);
+            boolean tfidf = list.contains("-I") || list.contains("--tfidf");
+
             // Leer el dataset ARFF de entrada
             DataSource dataSource = new DataSource(args[0]);
             Instances data = dataSource.getDataSet();
@@ -47,13 +50,12 @@ public class TransformData {
             StringToWordVector filter = new StringToWordVector();
             filter.setInputFormat(data);
             filter.setLowerCaseTokens(true);
-            filter.setTFTransform(true);  // Activa TF-IDF por defecto
-            filter.setIDFTransform(true);
-            filter.setDictionaryFileToSaveTo(new File(args[1])); // Guarda el diccionario
+            filter.setTFTransform(tfidf);
+            filter.setIDFTransform(tfidf);
+            filter.setDictionaryFileToSaveTo(new File(args[1]));
             data = Filter.useFilter(data, filter);
 
             // Verificar si se debe convertir a formato no disperso (Non-Sparse)
-            List<String> list = Arrays.asList(args);
             if (list.contains("-N") || list.contains("--nonsparse")) {
                 SparseToNonSparse filter2 = new SparseToNonSparse();
                 filter2.setInputFormat(data);
@@ -61,22 +63,25 @@ public class TransformData {
             }
 
             // Reordenar atributos (pone la clase en la última posición)
-            Reorder reorder = new Reorder();
-            reorder.setAttributeIndices("2-last,1");
-            reorder.setInputFormat(data);
-            data = Filter.useFilter(data, reorder);
+            if (data.numAttributes() > 1) {
+                Reorder reorder = new Reorder();
+                reorder.setAttributeIndices("2-last,1");
+                reorder.setInputFormat(data);
+                data = Filter.useFilter(data, reorder);
+            } else {
+                System.out.println("No se aplica reordenación: solo hay un atributo.");
+            }
 
             // Corregir nombres de atributos con caracteres especiales
             for (int i = 0; i < data.numAttributes(); i++) {
                 String attributeName = data.attribute(i).name();
-                // Si el nombre del atributo contiene caracteres especiales, escápalo con comillas simples
-                if (attributeName.matches(".*[^a-zA-Z0-9_].*")) {
+                if (attributeName.matches(".[^a-zA-Z0-9_].")) {
                     data.renameAttribute(i, "'" + attributeName + "'");
                 }
             }
 
             // Guardar el dataset transformado
-            String outputFile = args[2];  // El archivo de salida siempre será el tercer argumento
+            String outputFile = args[2];
             ArffSaver saver = new ArffSaver();
             saver.setInstances(data);
             saver.setFile(new File(outputFile));
