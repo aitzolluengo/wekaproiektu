@@ -3,108 +3,71 @@ package preprocessing;
 import java.io.File;
 import weka.core.Instances;
 import weka.core.converters.ArffSaver;
-import weka.core.converters.CSVLoader;
 import weka.core.converters.ConverterUtils.DataSource;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.FixedDictionaryStringToWordVector;
 import weka.filters.unsupervised.attribute.Reorder;
 
-// TODO: Auto-generated Javadoc
-/**
- * The Class MakeCompatible.
- */
+public class EnsureCompatibility {
 
-//ATRIBUTUEN HAUTAPENA//
-
-public class EnsureCompability {
-
-    /**
-     * The main method.
-     *
-     * @param args the arguments
-     * @throws Exception the exception
-     */
     public static void main(String[] args) throws Exception {
-
-        if(args.length  !=3) {
-            System.out.println("Ez duzu arguments atala behar bezala bete!");
-            System.out.println(args.length + " parametro sartu dituzu");
-            System.out.println("java -jar test.arff hiztegia.txt emaitza.arff");
+        if (args.length != 3) {
+            System.out.println("Uso: java -jar EnsureCompatibility.jar input.arff dictionary.txt output.arff");
+            return;
         }
-        else{
-            String arffIn= args[0];
-            String dictionary= args[1];
-            String arffOut= args[2];
-            for(String x: args)
-                System.out.println(x);
 
-            //dev multzoa lortu (arguments atalean sartzen den lehenengo parametroa args[0])
-            DataSource source=null;
-            if (arffIn.contains(".csv")) convertCSVtoArff(arffIn);
+        String inputArff = args[0];
+        String dictionaryFile = args[1];
+        String outputArff = args[2];
 
-            try {
-                source = new DataSource(arffIn);
-            } catch (Exception e) {
-                System.out.println("ERROREA - Sarrerako fitxategiaren helbidea okerra da");
-                return; // Salir del programa si hay un error
-            }
-            Instances dev= source.getDataSet();
+        // Load input dataset
+        DataSource source = new DataSource(inputArff);
+        Instances data = source.getDataSet();
 
-            //dev multzoaren klasea definitu
-            dev.setClassIndex(dev.numAttributes()-1);
+        // Set class index (last attribute)
+        data.setClassIndex(data.numAttributes() - 1);
 
-            //Orain parametro bezala (dictionary) lortu dugun hiztegia dev ean sartuko dugu FixedDictionaryStringToWordVector erabiliz
-            FixedDictionaryStringToWordVector hiztegia= new FixedDictionaryStringToWordVector();
-            hiztegia.setDictionaryFile(new File(dictionary));
-            hiztegia.setInputFormat(dev);
-            dev=Filter.useFilter(dev, hiztegia);
+        // Apply FixedDictionaryStringToWordVector
+        FixedDictionaryStringToWordVector fdsv = new FixedDictionaryStringToWordVector();
+        fdsv.setDictionaryFile(new File(dictionaryFile));
+        fdsv.setInputFormat(data);
+        Instances filteredData = Filter.useFilter(data, fdsv);
 
-            // Corregir nombres de atributos con caracteres especiales
-            for (int i = 0; i < dev.numAttributes(); i++) {
-                String attributeName = dev.attribute(i).name();
-                // Si el nombre del atributo contiene caracteres especiales, escápalo con comillas simples
-                if (attributeName.matches(".*[^a-zA-Z0-9_].*")) {
-                    dev.renameAttribute(i, "'" + attributeName + "'");
-                }
-            }
-
-            //Atributuak reordenartu, klasea amaieran agertu dadin, horretarako reorder filtroa erabiliko dugu
+        // Fix: Properly reorder attributes to move class to end
+        if (filteredData.classIndex() >= 0) {
             Reorder reorder = new Reorder();
-            reorder.setAttributeIndices("2-" + dev.numAttributes() + ",1");
-            reorder.setInputFormat(dev);
-            dev = Filter.useFilter(dev, reorder);
 
-            //arff fitxategia berria sortu arguments atalean sartu dugun helbidean (arffOut)
-            ArffSaver arffSaver = new ArffSaver();
-            arffSaver.setInstances(dev);
-            arffSaver.setFile(new File(arffOut));
-            arffSaver.writeBatch();
+            // Build attribute indices string:
+            // 1. All attributes except class
+            // 2. Then the class attribute
+            String indices = "";
 
-            System.out.println("Transformación completada. Archivo guardado en: " + arffOut);
+            // Add all attributes before class
+            if (filteredData.classIndex() > 0) {
+                indices += "1-" + filteredData.classIndex();
+            }
+
+            // Add all attributes after class
+            if (filteredData.classIndex() < filteredData.numAttributes() - 1) {
+                if (!indices.isEmpty()) indices += ",";
+                indices += (filteredData.classIndex() + 2) + "-" + filteredData.numAttributes();
+            }
+
+            // Finally add the class attribute
+            if (!indices.isEmpty()) indices += ",";
+            indices += (filteredData.classIndex() + 1);
+
+            reorder.setAttributeIndices(indices);
+            reorder.setInputFormat(filteredData);
+            filteredData = Filter.useFilter(filteredData, reorder);
         }
-    }
 
-    /**
-     * Convert CS vto arff.
-     *
-     * @param filename the filename
-     * @throws Exception the exception
-     */
-    public static void convertCSVtoArff(String filename) throws Exception {
-
-        // CSV-a kargatu
-        CSVLoader loader = new CSVLoader();
-        loader.setSource(new File(filename));
-
-        Instances data = loader.getDataSet();
-
-        // save ARFF
+        // Save output
         ArffSaver saver = new ArffSaver();
-        saver.setInstances(data);
-
-        filename = filename.replace(".csv", ".arff");
-
-        saver.setFile(new File(filename));
+        saver.setInstances(filteredData);
+        saver.setFile(new File(outputArff));
         saver.writeBatch();
+
+        System.out.println("Transformación completada. Archivo guardado en: " + outputArff);
     }
 }
