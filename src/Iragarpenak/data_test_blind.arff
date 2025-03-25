@@ -1,0 +1,150 @@
+@relation adult_test.data-weka.filters.supervised.instance.Resample-B0.0-S1-Z70.0-no-replacement-V-weka.filters.supervised.instance.Resample-B0.0-S1-Z30.0-no-replacement-weka.filters.supervised.instance.Resample-B0.0-S1-Z30.0-no-replacement-weka.filters.supervised.instance.Resample-B0.0-S1-Z30.0-no-replacement
+
+@attribute age numeric
+@attribute ' workclass' {' State-gov',' Self-emp-not-inc',' Private',' Federal-gov',' Local-gov',' ?',' Self-emp-inc',' Without-pay',' Never-worked'}
+@attribute ' fnlwg' numeric
+@attribute ' education' {' Bachelors',' HS-grad',' 11th',' Masters',' 9th',' Some-college',' Assoc-acdm',' Assoc-voc',' 7th-8th',' Doctorate',' Prof-school',' 5th-6th',' 10th',' 1st-4th',' Preschool',' 12th'}
+@attribute ' education-num' numeric
+@attribute ' marital-status' {' Never-married',' Married-civ-spouse',' Divorced',' Married-spouse-absent',' Separated',' Married-AF-spouse',' Widowed'}
+@attribute ' occupation' {' Adm-clerical',' Exec-managerial',' Handlers-cleaners',' Prof-specialty',' Other-service',' Sales',' Craft-repair',' Transport-moving',' Farming-fishing',' Machine-op-inspct',' Tech-support',' ?',' Protective-serv',' Armed-Forces',' Priv-house-serv'}
+@attribute ' relationship' {' Not-in-family',' Husband',' Wife',' Own-child',' Unmarried',' Other-relative'}
+@attribute ' race' {' White',' Black',' Asian-Pac-Islander',' Amer-Indian-Eskimo',' Other'}
+@attribute ' sex' {' Male',' Female'}
+@attribute ' capital-gain' numeric
+@attribute ' capital-loss' numeric
+@attribute ' hours-per-week' numeric
+@attribute ' native-country' {' United-States',' Cuba',' Jamaica',' India',' ?',' Mexico',' South',' Puerto-Rico',' Honduras',' England',' Canada',' Germany',' Iran',' Philippines',' Italy',' Poland',' Columbia',' Cambodia',' Thailand',' Ecuador',' Laos',' Taiwan',' Haiti',' Portugal',' Dominican-Republic',' El-Salvador',' France',' Guatemala',' China',' Japan',' Yugoslavia',' Peru',' Outlying-US(Guam-USVI-etc)',' Scotland',' Trinadad&Tobago',' Greece',' Nicaragua',' Vietnam',' Hong',' Ireland',' Hungary',' Holand-Netherlands'}
+@attribute ' class' {' <=50K',' >50K', suspicious}
+
+@data
+31,' Private',268282,' 7th-8th',4,' Married-civ-spouse',' Farming-fishing',' Other-relative',' White',' Male',0,0,35,' Mexico',?
+37,' Private',224566,' Some-college',10,' Married-civ-spouse',' Tech-support',?,' White',' Male',0,0,39,' United-States',?
+28,' Private',257405,' 5th-6th',3,' Never-married',' Farming-fishing',' Unmarried',' Black',' Male',0,0,40,' Mexico',?
+22,' Private',163519,' Some-college',10,' Never-married',' Handlers-cleaners',' Own-child',' White',' Male',0,0,25,' United-States',?
+61,' Private',185584,' Bachelors',13,' Widowed',' Machine-op-inspct',' Unmarried',' Asian-Pac-Islander',' Female',0,0,40,' ?',?
+32,' Private',158438,' HS-grad',9,' Divorced',' Transport-moving',' Own-child',' White',' Male',0,0,40,' United-States',?
+32,' Private',30433,' Bachelors',13,' Never-married',' Tech-support',' Other-relative',' White',' Female',0,0,72,' United-States',?
+55,' Private',150507,' Some-college',10,' Married-civ-spouse',' Adm-clerical',?,' White',' Male',0,0,40,' United-States',?
+19,' Private',193859,' Some-college',10,' Never-married',' Adm-clerical',' Not-in-family',' White',' Male',2176,0,35,' Germany',?
+24,' Private',198259,' Bachelors',13,' Never-married',' Exec-managerial',' Own-child',' White',' Female',0,0,40,' United-States',?
+42,' Private',191196,' Assoc-acdm',12,' Divorced',' Adm-clerical',' Not-in-family',' White',' Male',0,0,40,' United-States',?
+31,' Private',88231,' Bachelors',13,' Never-married',' Craft-repair',' Not-in-family',' White',' Male',0,0,40,' United-States',?
+32,' Private',137184,' Some-college',10,' Married-civ-spouse',' Craft-repair',?,' White',' Male',0,0,40,' United-States',?
+19,' Private',255176,' HS-grad',9,' Never-married',' Adm-clerical',' Own-child',' White',' Female',0,0,20,' United-States',?
+58,' Private',219537,' 7th-8th',4,' Divorced',' Machine-op-inspct',' Unmarried',' White',' Female',0,0,40,' United-States',?
+41,' Private',132853,' 1st-4th',2,' Married-civ-spouse',' Transport-moving',?,' White',' Male',0,0,40,' Mexico',?
+39,' Self-emp-not-inc',179488,' HS-grad',9,' Married-civ-spouse',' Exec-managerial',?,' White',' Male',0,0,50,' United-States',?
+34,' Local-gov',28568,' HS-grad',9,' Divorced',' Craft-repair',' Unmarried',' White',' Male',0,0,40,' United-States',?
+50,' Private',243115,' HS-grad',9,' Married-spouse-absent',' Adm-clerical',' Other-relative',' White',' Female',0,0,40,' United-States',?
+20,' Private',403118,' Some-college',10,' Never-married',' Other-service',' Own-child',' White',' Female',0,0,11,' United-States',?
+59,' ?',168079,' HS-grad',9,' Divorced',' ?',' Unmarried',' White',' Female',0,0,35,' United-States',?
+31,' State-gov',46492,' Assoc-voc',11,' Never-married',' Craft-repair',' Own-child',' White',' Male',0,0,40,' United-States',?
+22,' State-gov',62865,' Some-college',10,' Never-married',' Adm-clerical',' Not-in-family',' White',' Female',0,0,8,' United-States',?
+33,' Private',117963,' HS-grad',9,' Never-married',' Machine-op-inspct',' Other-relative',' White',' Male',0,0,55,' United-States',?
+41,' Self-emp-inc',277858,' Bachelors',13,' Widowed',' Exec-managerial',' Not-in-family',' Black',' Female',0,0,45,' United-States',?
+40,' Private',210493,' 11th',7,' Widowed',' Adm-clerical',' Unmarried',?,' Female',0,0,40,' United-States',?
+27,' Local-gov',189775,' 12th',8,' Never-married',' Other-service',' Own-child',' Black',' Female',0,0,44,' United-States',?
+31,' Private',386299,' Some-college',10,' Never-married',' Adm-clerical',' Not-in-family',?,' Female',0,0,40,' United-States',?
+38,' Private',189092,' Assoc-voc',11,' Married-civ-spouse',' Craft-repair',?,?,' Male',0,0,43,' United-States',?
+25,' Private',167495,' Some-college',10,' Never-married',' Adm-clerical',' Unmarried',?,' Female',0,0,40,' United-States',?
+17,' Private',190941,' 10th',6,' Never-married',' Sales',' Own-child',?,' Female',0,0,20,' United-States',?
+27,' Private',169557,' HS-grad',9,' Divorced',' Machine-op-inspct',' Not-in-family',?,' Male',6849,0,40,' United-States',?
+21,' Private',191789,' Some-college',10,' Never-married',' Adm-clerical',' Own-child',?,' Female',0,0,10,' ?',?
+18,' Private',112626,' Some-college',10,' Never-married',' Priv-house-serv',' Own-child',?,' Female',0,0,15,' United-States',?
+44,' Private',162372,' 9th',5,' Married-civ-spouse',' Craft-repair',?,' White',' Male',0,0,45,' Puerto-Rico',?
+64,' Private',170645,' 5th-6th',3,' Married-civ-spouse',' Machine-op-inspct',?,?,' Male',2105,0,40,' United-States',?
+30,' Private',140612,' HS-grad',9,' Married-civ-spouse',' Craft-repair',' Husband',' White',' Male',0,2051,40,' United-States',?
+20,' Private',175069,' Some-college',10,' Never-married',' Sales',' Own-child',' White',' Male',1055,0,30,' United-States',?
+29,' State-gov',108432,' Masters',14,' Never-married',' Prof-specialty',' Not-in-family',' White',' Male',0,0,40,' United-States',?
+48,' Private',44216,' Masters',14,' Never-married',' Adm-clerical',' Not-in-family',' White',' Female',0,0,20,' United-States',?
+39,' Private',191161,' HS-grad',9,' Separated',' Craft-repair',' Unmarried',' White',' Male',0,0,55,' United-States',?
+21,' Local-gov',129050,' Some-college',10,' Never-married',' Prof-specialty',' Own-child',?,' Female',0,0,35,' United-States',?
+22,' Private',292055,' Assoc-voc',11,' Never-married',' Sales',' Not-in-family',' White',' Female',0,0,37,' United-States',?
+25,' Private',220220,' HS-grad',9,' Never-married',' Handlers-cleaners',' Not-in-family',' White',' Male',0,0,47,' United-States',?
+31,' ?',212529,' Some-college',10,' Never-married',' ?',' Own-child',' Black',' Male',0,0,40,' United-States',?
+23,' Private',208238,' 10th',6,' Never-married',' Sales',' Own-child',' White',' Female',0,0,20,' United-States',?
+17,' Private',98005,' 11th',7,' Never-married',' Sales',' Own-child',' White',' Female',0,0,20,' United-States',?
+68,' Local-gov',137518,' HS-grad',9,' Widowed',' Adm-clerical',' Not-in-family',' White',' Female',0,0,33,' United-States',?
+64,' Private',162761,' Some-college',10,' Widowed',' Sales',' Not-in-family',' White',' Male',2354,0,35,' United-States',?
+49,' Private',80026,' 7th-8th',4,' Married-civ-spouse',' Craft-repair',' Husband',' White',' Male',0,0,50,' United-States',?
+30,' Private',85374,' Some-college',10,' Never-married',' Handlers-cleaners',' Not-in-family',' White',' Male',0,0,45,' United-States',?
+44,' Self-emp-inc',148805,' HS-grad',9,' Divorced',' Other-service',' Unmarried',' White',' Female',0,0,33,' United-States',?
+24,' Private',201799,' Bachelors',13,' Never-married',' Transport-moving',' Own-child',' White',' Female',0,0,84,' United-States',?
+59,' Self-emp-inc',155259,' Some-college',10,' Married-civ-spouse',' Exec-managerial',' Wife',' White',' Female',0,0,20,' United-States',?
+49,' Self-emp-inc',195727,' HS-grad',9,' Married-civ-spouse',' Sales',' Husband',' White',' Male',0,0,40,' United-States',?
+43,' Private',141327,' HS-grad',9,' Divorced',' Machine-op-inspct',' Not-in-family',' White',' Female',0,0,40,' United-States',?
+23,' Private',90729,' 11th',7,' Never-married',' Machine-op-inspct',' Unmarried',' Other',' Male',0,0,40,' United-States',?
+20,' ?',49819,' Some-college',10,' Never-married',' ?',' Own-child',' White',' Female',0,0,40,' United-States',?
+35,' Private',169037,' HS-grad',9,' Married-civ-spouse',' Transport-moving',' Wife',' White',' Female',0,0,48,' United-States',?
+29,' Private',33436,' HS-grad',9,' Never-married',' Sales',' Unmarried',' White',' Female',0,0,42,' United-States',?
+24,' Private',108670,' Assoc-voc',11,' Never-married',' Other-service',' Unmarried',' White',' Female',0,0,32,' United-States',?
+32,' Private',107142,' Assoc-voc',11,' Married-civ-spouse',' Craft-repair',' Husband',' White',' Male',5013,0,50,' United-States',?
+35,' Private',241306,' Some-college',10,' Never-married',' Sales',' Not-in-family',' White',' Male',0,0,50,' United-States',?
+21,' Private',159879,' Some-college',10,' Never-married',' Adm-clerical',' Own-child',' White',' Female',0,0,40,' United-States',?
+34,' Self-emp-not-inc',236391,' 11th',7,' Married-civ-spouse',' Sales',' Wife',' White',' Female',0,0,30,' United-States',?
+49,' Private',289964,' Some-college',10,' Separated',' Sales',' Not-in-family',' White',' Male',0,0,50,' United-States',?
+42,' Local-gov',270147,' Masters',14,' Never-married',' Prof-specialty',' Not-in-family',' White',' Female',0,0,40,' United-States',?
+21,' Private',366929,' HS-grad',9,' Married-civ-spouse',' Sales',' Wife',' White',' Female',0,0,38,' United-States',?
+42,' Self-emp-not-inc',54583,' Bachelors',13,' Divorced',' Prof-specialty',' Unmarried',' White',' Female',0,0,30,' United-States',?
+26,' Private',131401,' Bachelors',13,' Never-married',' Exec-managerial',' Not-in-family',' White',' Female',0,0,40,' United-States',?
+55,' Self-emp-not-inc',141122,' Bachelors',13,' Married-civ-spouse',' Exec-managerial',?,' White',' Male',0,0,50,' United-States',?
+65,' Self-emp-inc',150095,' HS-grad',9,' Married-civ-spouse',' Transport-moving',?,' White',' Male',0,0,40,' United-States',?
+35,' Self-emp-not-inc',61343,' HS-grad',9,' Divorced',' Machine-op-inspct',' Unmarried',' White',' Male',0,0,40,' United-States',?
+29,' ?',42623,' HS-grad',9,' Never-married',' ?',' Not-in-family',' White',' Male',0,0,32,' United-States',?
+72,' Private',74749,' HS-grad',9,' Married-civ-spouse',' Sales',' Wife',' White',' Female',0,0,17,' United-States',?
+47,' Local-gov',40690,' Some-college',10,' Divorced',' Craft-repair',' Not-in-family',' White',' Male',0,0,40,' United-States',?
+38,' Private',81846,' Masters',14,' Married-civ-spouse',' Prof-specialty',?,' Asian-Pac-Islander',' Male',0,0,40,' China',?
+49,' Private',99340,' 5th-6th',3,' Separated',' Machine-op-inspct',' Unmarried',' White',' Female',0,0,40,' Dominican-Republic',?
+26,' Private',234258,' HS-grad',9,' Married-civ-spouse',' Machine-op-inspct',?,' Black',' Male',0,0,40,' United-States',?
+52,' Private',102444,' 7th-8th',4,' Married-civ-spouse',' Machine-op-inspct',?,' White',' Male',0,0,40,' United-States',?
+36,' Private',36423,' Some-college',10,' Married-civ-spouse',' Adm-clerical',?,' White',' Male',0,0,60,' United-States',?
+46,' Self-emp-not-inc',225065,' Bachelors',13,' Separated',' Other-service',' Unmarried',' White',' Female',0,0,45,' Nicaragua',?
+45,' Private',101825,' Some-college',10,' Divorced',' Exec-managerial',' Unmarried',' White',' Female',5721,0,45,' United-States',?
+24,' ?',243923,' 9th',5,' Married-civ-spouse',' ?',?,' White',' Male',0,0,10,' Mexico',?
+47,' Private',100113,' 7th-8th',4,' Married-civ-spouse',' Transport-moving',?,' White',' Male',0,2051,40,' United-States',?
+42,' Private',208347,' 11th',7,' Never-married',' Machine-op-inspct',' Not-in-family',' Other',' Female',0,0,40,' Puerto-Rico',?
+32,' Private',32326,' Bachelors',13,' Married-civ-spouse',' Craft-repair',' Wife',' White',' Female',0,0,40,' United-States',?
+58,' Local-gov',217802,' Masters',14,' Married-civ-spouse',' Prof-specialty',' Husband',' Black',' Male',7688,0,45,' United-States',?
+32,' Private',386806,' 5th-6th',3,' Married-civ-spouse',' Craft-repair',' Husband',' Other',' Male',0,0,45,' Mexico',?
+46,' Private',169711,' Some-college',10,' Married-civ-spouse',' Prof-specialty',' Husband',' White',' Male',0,0,40,' United-States',?
+66,' State-gov',33155,' HS-grad',9,' Married-civ-spouse',' Exec-managerial',' Husband',' White',' Male',0,0,45,' United-States',?
+34,' Private',55849,' HS-grad',9,' Married-civ-spouse',' Exec-managerial',' Husband',' White',' Male',7298,0,50,' United-States',?
+45,' Private',165822,' Bachelors',13,' Married-civ-spouse',' Exec-managerial',' Husband',' White',' Male',0,0,50,' United-States',?
+45,' Local-gov',265477,' Masters',14,' Married-civ-spouse',' Prof-specialty',' Husband',' White',' Male',0,0,40,' France',?
+55,' Private',123436,' Assoc-voc',11,' Married-civ-spouse',' Prof-specialty',' Husband',' White',' Male',0,0,40,' United-States',?
+50,' Private',106422,' HS-grad',9,' Married-civ-spouse',' Sales',' Wife',' Black',' Female',0,1485,37,' United-States',?
+33,' Private',158438,' Some-college',10,' Married-civ-spouse',' Craft-repair',' Husband',' White',' Male',0,0,50,' United-States',?
+30,' Private',179747,' HS-grad',9,' Married-civ-spouse',' Craft-repair',' Husband',' White',' Male',0,0,45,' United-States',?
+47,' Private',70554,' Some-college',10,' Never-married',' Craft-repair',' Not-in-family',' White',' Male',0,0,40,' United-States',?
+57,' Self-emp-inc',231781,' Masters',14,' Married-civ-spouse',' Exec-managerial',' Husband',' White',' Male',0,0,50,' United-States',?
+35,' Private',190297,' Bachelors',13,' Married-civ-spouse',' Sales',' Husband',' White',' Male',0,1977,65,' United-States',?
+56,' Private',176079,' HS-grad',9,' Married-civ-spouse',' Adm-clerical',' Wife',' White',' Female',15024,0,24,' United-States',?
+36,' Private',153078,' Masters',14,' Married-civ-spouse',' Exec-managerial',' Husband',' Asian-Pac-Islander',' Male',15024,0,40,' Hong',?
+33,' Self-emp-not-inc',37232,' Assoc-voc',11,' Divorced',' Craft-repair',' Not-in-family',' White',' Male',10520,0,80,' United-States',?
+32,' Private',170276,' Bachelors',13,' Never-married',' Exec-managerial',' Not-in-family',' White',' Female',0,0,46,' United-States',?
+42,' Private',144594,' HS-grad',9,' Married-civ-spouse',' Craft-repair',' Husband',' White',' Male',0,0,40,' United-States',?
+48,' Self-emp-inc',49298,' Doctorate',16,' Married-civ-spouse',' Prof-specialty',' Husband',' White',' Male',0,1902,50,' United-States',?
+56,' Self-emp-not-inc',121362,' Bachelors',13,' Married-civ-spouse',' Exec-managerial',' Wife',' White',' Female',15024,0,40,' United-States',?
+39,' Local-gov',218490,' Assoc-acdm',12,' Married-civ-spouse',' Craft-repair',' Husband',' White',' Male',0,0,40,' United-States',?
+58,' Self-emp-not-inc',290670,' Bachelors',13,' Married-civ-spouse',' Exec-managerial',' Husband',' White',' Male',0,0,55,' United-States',?
+66,' Private',115880,' Bachelors',13,' Married-civ-spouse',' Prof-specialty',' Husband',' White',' Male',10605,0,40,' United-States',?
+64,' Private',96076,' Masters',14,' Married-civ-spouse',' Prof-specialty',' Husband',' White',' Male',0,0,40,' United-States',?
+28,' Private',118089,' HS-grad',9,' Married-civ-spouse',' Exec-managerial',' Husband',' White',' Male',4386,0,45,' United-States',?
+40,' Private',369781,' HS-grad',9,' Married-civ-spouse',' Handlers-cleaners',' Husband',' White',' Male',15024,0,45,' United-States',?
+46,' Private',165468,' Some-college',10,' Married-civ-spouse',' Craft-repair',?,?,' Male',0,0,50,' United-States',?
+30,' Private',197886,' Bachelors',13,' Never-married',' Sales',' Own-child',?,' Male',0,0,40,' United-States',?
+35,' Private',235485,' Bachelors',13,' Married-civ-spouse',' Exec-managerial',' Husband',' White',' Male',0,0,40,' United-States',?
+35,' Private',138441,' Bachelors',13,' Married-civ-spouse',' Exec-managerial',?,?,' Male',0,0,40,' United-States',?
+36,' Private',22245,' HS-grad',9,' Married-civ-spouse',' Sales',?,?,' Male',0,0,40,' United-States',?
+75,' Private',186808,' 11th',7,' Married-civ-spouse',' Protective-serv',?,' Black',' Male',6418,0,50,' United-States',?
+51,' Private',353317,' Masters',14,' Married-civ-spouse',' Exec-managerial',?,?,' Male',0,0,70,' United-States',?
+33,' Private',229051,' Bachelors',13,' Married-civ-spouse',' Exec-managerial',?,?,' Male',0,1902,45,' United-States',?
+50,' Self-emp-inc',288630,' Masters',14,' Married-civ-spouse',' Exec-managerial',' Husband',' White',' Male',0,0,50,' United-States',?
+49,' Private',93557,' HS-grad',9,' Married-civ-spouse',' Exec-managerial',' Husband',' White',' Male',0,0,48,' United-States',?
+54,' Federal-gov',72257,' HS-grad',9,' Married-civ-spouse',' Machine-op-inspct',' Husband',' White',' Male',7688,0,40,' United-States',?
+46,' Private',168262,' Bachelors',13,' Married-civ-spouse',' Adm-clerical',' Husband',' White',' Male',0,0,40,' United-States',?
+40,' Self-emp-inc',188615,' 11th',7,' Married-civ-spouse',' Exec-managerial',' Husband',' White',' Male',15024,0,20,' United-States',?
+63,' Federal-gov',31115,' Some-college',10,' Married-civ-spouse',' Exec-managerial',' Husband',' White',' Male',15024,0,40,' United-States',?
+39,' Private',177140,' HS-grad',9,' Separated',' Adm-clerical',' Not-in-family',' White',' Male',0,0,40,' United-States',?
+33,' Private',473133,' Doctorate',16,' Married-civ-spouse',' Prof-specialty',' Husband',' White',' Male',15024,0,50,' United-States',?
+50,' Private',256908,' Doctorate',16,' Married-civ-spouse',' Sales',' Husband',' White',' Male',0,0,50,' United-States',?
