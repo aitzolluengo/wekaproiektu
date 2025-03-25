@@ -1,3 +1,5 @@
+package Sailkatzailea;
+
 import java.io.PrintWriter;
 import java.util.Random;
 import weka.classifiers.bayes.NaiveBayes;
@@ -18,6 +20,8 @@ public class NaiveBayesModel {
 
             // Entrena un modelo Naive Bayes con todos los datos
             NaiveBayes nbGuztiak = new NaiveBayes();
+            nbGuztiak.setUseSupervisedDiscretization(false);
+            nbGuztiak.setUseKernelEstimator(false);
             nbGuztiak.buildClassifier(data);
 
             // Hold-Out repeated
