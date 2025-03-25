@@ -1,4 +1,4 @@
-package Classifier;
+package Sailkatzailea;
 import weka.classifiers.Evaluation;
 
 import java.io.FileWriter;
@@ -163,40 +163,5 @@ public class ParametroenBilaketa {
             return minclassindex;
     }
 }
-    public static Instances convertirClaseNominalANumerica(Instances data) throws Exception {
-        // Crear nueva estructura sin la clase nominal original
-        ArrayList<Attribute> atributos = new ArrayList<>();
 
-        for (int i = 0; i < data.numAttributes(); i++) {
-            if (i != data.classIndex()) {
-                atributos.add(data.attribute(i));
-            }
-        }
 
-        // Añadir atributo de clase numérica
-        atributos.add(new Attribute("class")); // numérico por defecto
-
-        // Crear nuevo dataset
-        Instances nuevoData = new Instances("data_numerico", atributos, data.numInstances());
-        nuevoData.setClassIndex(nuevoData.numAttributes() - 1);
-
-        // Copiar datos y transformar clase
-        for (int i = 0; i < data.numInstances(); i++) {
-            double[] vals = new double[nuevoData.numAttributes()];
-
-            int k = 0;
-            for (int j = 0; j < data.numAttributes(); j++) {
-                if (j == data.classIndex()) continue;
-                vals[k++] = data.instance(i).value(j);
-            }
-
-            // Transformar clase nominal a numérica: spam = 1, ham = 0
-            String claseOriginal = data.instance(i).stringValue(data.classIndex());
-            vals[k] = claseOriginal.equalsIgnoreCase("spam") ? 1.0 : 0.0;
-
-            nuevoData.add(new DenseInstance(1.0, vals));
-        }
-
-        return nuevoData;
-    }
-}

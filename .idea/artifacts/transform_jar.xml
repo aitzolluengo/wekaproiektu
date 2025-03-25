@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="transform:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/transform_jar</output-path>
+    <root id="archive" name="testmining.jar">
+      <element id="module-output" name="testmining" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/weka.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
