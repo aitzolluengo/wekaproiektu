@@ -2,14 +2,14 @@ package Sailkatzailea;
 
 import java.io.File;
 import java.io.PrintWriter;
-
+import weka.attributeSelection.InfoGainAttributeEval;
 import weka.attributeSelection.Ranker;
 import weka.core.Instances;
 import weka.core.converters.ArffSaver;
 import weka.core.converters.ConverterUtils.DataSource;
 import weka.filters.Filter;
 import weka.filters.supervised.attribute.AttributeSelection;
-import weka.attributeSelection.InfoGainAttributteEval;
+
 public class AtributuenAukeraketa {
 
     public static void main(String[] args) throws Exception {
@@ -20,7 +20,7 @@ public class AtributuenAukeraketa {
             data.setClassIndex(data.numAttributes() - 1);
 
             // Aplicar selección de atributos
-            InfoGainAttributteEval gr = new InfoGainAttributteEval();
+            InfoGainAttributeEval evaluator = new InfoGainAttributeEval();
             Ranker ranker = new Ranker();
             if (args.length == 4 && Integer.parseInt(args[3]) <= 350) {
                 ranker.setNumToSelect(Integer.parseInt(args[3]));
@@ -29,7 +29,7 @@ public class AtributuenAukeraketa {
 
             AttributeSelection as = new AttributeSelection();
             as.setInputFormat(data);
-            as.setEvaluator(gr);
+            as.setEvaluator(evaluator);
             as.setSearch(ranker);
             Instances filteredData = Filter.useFilter(data, as);
 
@@ -44,12 +44,7 @@ public class AtributuenAukeraketa {
             pw.println();
             for (int i = 0; i < filteredData.numAttributes() - 1; i++) {
                 String s = filteredData.attribute(i).name();
-                // Verificar que el nombre del atributo tenga al menos 2 caracteres
-                if (s.length() >= 2) {
-                    pw.println(s.substring(0, s.length() - 2));
-                } else {
-                    pw.println(s); // Si es demasiado corto, imprimir el nombre completo
-                }
+                pw.println(s); // Guardar el nombre completo del atributo sin modificarlo
             }
             pw.close();
         } else {
