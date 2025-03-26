@@ -9,7 +9,7 @@ import weka.core.converters.ArffSaver;
 import weka.core.converters.ConverterUtils.DataSource;
 import weka.filters.Filter;
 import weka.filters.supervised.attribute.AttributeSelection;
-import weka.attributeSelection.InfoGainAtributteEval;
+import weka.attributeSelection.InfoGainAttributteEval;
 public class AtributuenAukeraketa {
 
     public static void main(String[] args) throws Exception {
@@ -20,7 +20,7 @@ public class AtributuenAukeraketa {
             data.setClassIndex(data.numAttributes() - 1);
 
             // Aplicar selección de atributos
-            InfoGainAtributteEval gr = new InfoGainAtributteEval();
+            InfoGainAttributteEval gr = new InfoGainAttributteEval();
             Ranker ranker = new Ranker();
             if (args.length == 4 && Integer.parseInt(args[3]) <= 350) {
                 ranker.setNumToSelect(Integer.parseInt(args[3]));
