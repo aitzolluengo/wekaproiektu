@@ -3,14 +3,13 @@ package Sailkatzailea;
 import java.io.File;
 import java.io.PrintWriter;
 
-import weka.attributeSelection.GainRatioAttributeEval;
 import weka.attributeSelection.Ranker;
 import weka.core.Instances;
 import weka.core.converters.ArffSaver;
 import weka.core.converters.ConverterUtils.DataSource;
 import weka.filters.Filter;
 import weka.filters.supervised.attribute.AttributeSelection;
-
+import weka.attributeSelection.InfoGainAtributteEval;
 public class AtributuenAukeraketa {
 
     public static void main(String[] args) throws Exception {
@@ -21,12 +20,12 @@ public class AtributuenAukeraketa {
             data.setClassIndex(data.numAttributes() - 1);
 
             // Aplicar selección de atributos
-            GainRatioAttributeEval gr = new GainRatioAttributeEval();
+            InfoGainAtributteEval gr = new InfoGainAtributteEval();
             Ranker ranker = new Ranker();
             if (args.length == 4 && Integer.parseInt(args[3]) <= 350) {
                 ranker.setNumToSelect(Integer.parseInt(args[3]));
             }
-            ranker.setThreshold(0.1);
+            ranker.setThreshold(-1.7976931348623157E308);
 
             AttributeSelection as = new AttributeSelection();
             as.setInputFormat(data);
