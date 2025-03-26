@@ -12,8 +12,8 @@ import java.io.PrintWriter;
 public class Iragarpenak {
     public static void main(String[] args) {
         try {
-            if (args.length < 2) {
-                System.out.println("Uso: java Iragarpenak <modelo> <datos_test>");
+            if (args.length < 3) {
+                System.out.println("Uso: java Iragarpenak <modelo> <datos_test> <OutputFile>");
                 return;
             }
 
