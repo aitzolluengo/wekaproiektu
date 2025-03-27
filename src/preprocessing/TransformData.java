@@ -69,13 +69,13 @@ public class TransformData {
                 reorder.setInputFormat(data);
                 data = Filter.useFilter(data, reorder);
             } else {
-                System.out.println("No se aplica reordenación: solo hay un atributo.");
+                System.out.println("⚠️ No se aplica reordenación: solo hay un atributo.");
             }
 
             // Corregir nombres de atributos con caracteres especiales
             for (int i = 0; i < data.numAttributes(); i++) {
                 String attributeName = data.attribute(i).name();
-                if (attributeName.matches(".[^a-zA-Z0-9_].")) {
+                if (attributeName.matches(".*[^a-zA-Z0-9_].*")) {
                     data.renameAttribute(i, "'" + attributeName + "'");
                 }
             }
@@ -87,9 +87,9 @@ public class TransformData {
             saver.setFile(new File(outputFile));
             saver.writeBatch();
 
-            System.out.println("Transformación completada. Archivo guardado en: " + outputFile);
+            System.out.println("✅ Transformación completada. Archivo guardado en: " + outputFile);
         } catch (Exception e) {
-            System.err.println("Error durante la transformación: " + e.getMessage());
+            System.err.println("❌ Error durante la transformación: " + e.getMessage());
             e.printStackTrace();
         }
     }
