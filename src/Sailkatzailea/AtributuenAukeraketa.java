@@ -1,55 +1,88 @@
 package Sailkatzailea;
 
-import java.io.File;
-import java.io.PrintWriter;
-import weka.attributeSelection.InfoGainAttributeEval;
-import weka.attributeSelection.Ranker;
-import weka.core.Instances;
-import weka.core.converters.ArffSaver;
-import weka.core.converters.ConverterUtils.DataSource;
-import weka.filters.Filter;
+import java.io.*;
+import weka.attributeSelection.*;
+import weka.core.*;
+import weka.core.converters.*;
+import weka.filters.*;
 import weka.filters.supervised.attribute.AttributeSelection;
+import weka.core.converters.ConverterUtils.DataSource;
 
 public class AtributuenAukeraketa {
-
     public static void main(String[] args) throws Exception {
-        if (args.length == 3 || args.length == 4) {
-            // Cargar datos
-            DataSource source = new DataSource(args[0]);
-            Instances data = source.getDataSet();
-            data.setClassIndex(data.numAttributes() - 1);
+        // Validación de parámetros mejorada
+        if (args.length < 3 || args.length > 4) {
+            System.err.println("Uso: java AtributuenAukeraketa <input.arff> <output.arff> <diccionario.txt> [numAtributos]");
+            System.err.println("  numAtributos: Opcional (valor por defecto: todos)");
+            System.exit(1);
+        }
 
-            // Aplicar selección de atributos
+        try {
+            // 1. Cargar datos
+            System.out.println("Cargando dataset...");
+            Instances data = new DataSource(args[0]).getDataSet();
+            data.setClassIndex(data.numAttributes() - 1);
+            System.out.printf("Atributos cargados: %d%n", data.numAttributes());
+
+            // 2. Configurar selección de atributos
             InfoGainAttributeEval evaluator = new InfoGainAttributeEval();
             Ranker ranker = new Ranker();
-            if (args.length == 4 && Integer.parseInt(args[3]) <= 350) {
-                ranker.setNumToSelect(Integer.parseInt(args[3]));
+
+            // Manejar parámetro opcional de número de atributos
+            if (args.length == 4) {
+                int numAttr = Integer.parseInt(args[3]);
+                if (numAttr <= 0 || numAttr > data.numAttributes()) {
+                    System.err.println("Número de atributos inválido. Usando todos.");
+                } else {
+                    ranker.setNumToSelect(numAttr);
+                    System.out.printf("Seleccionando los %d mejores atributos%n", numAttr);
+                }
             }
             ranker.setThreshold(-1.7976931348623157E308);
 
-            AttributeSelection as = new AttributeSelection();
-            as.setInputFormat(data);
-            as.setEvaluator(evaluator);
-            as.setSearch(ranker);
-            Instances filteredData = Filter.useFilter(data, as);
+            // 3. Aplicar filtro
+            AttributeSelection filter = new AttributeSelection();
+            filter.setEvaluator(evaluator);
+            filter.setSearch(ranker);
+            filter.setInputFormat(data);
+            Instances filteredData = Filter.useFilter(data, filter);
+            System.out.printf("Atributos después de filtrar: %d%n", filteredData.numAttributes());
 
-            // Guardar el conjunto de datos filtrado
+            // 4. Guardar datos filtrados
             ArffSaver saver = new ArffSaver();
             saver.setInstances(filteredData);
             saver.setFile(new File(args[1]));
             saver.writeBatch();
 
-            // Guardar la lista de atributos seleccionados
-            PrintWriter pw = new PrintWriter(args[2]);
-            pw.println();
-            for (int i = 0; i < filteredData.numAttributes() - 1; i++) {
-                String s = filteredData.attribute(i).name();
-                pw.println(s); // Guardar el nombre completo del atributo sin modificarlo
+            // 5. Guardar diccionario con metadatos completos
+            try (PrintWriter pw = new PrintWriter(args[2])) {
+                pw.println("=== METADATOS DE ATRIBUTOS ===");
+                pw.printf("Total atributos originales: %d%n", data.numAttributes());
+                pw.printf("Atributos seleccionados: %d%n", filteredData.numAttributes() - 1);
+                pw.println("Formato: índice_original|nombre_atributo");
+
+                // Guardar con índice original para referencia
+                for (int i = 0; i < filteredData.numAttributes() - 1; i++) {
+                    String attrName = filteredData.attribute(i).name();
+                    // Buscar índice original
+                    int originalIndex = -1;
+                    for (int j = 0; j < data.numAttributes(); j++) {
+                        if (data.attribute(j).name().equals(attrName)) {
+                            originalIndex = j;
+                            break;
+                        }
+                    }
+                    pw.printf("%d|%s%n", originalIndex + 1, attrName); // +1 para compatibilidad con Weka
+                }
             }
-            pw.close();
-        } else {
-            System.out.println("3 parametro behar dira eta zuk " + args.length + " jarri dituzu!!");
-            System.out.println("java -jar AtributuenAukeraketa.jar trainPath.arff filteredPath.arff hiztegia atributuLimitea(aukerazkoa)");
+
+            System.out.println("Proceso completado con éxito!");
+            System.out.printf("Diccionario guardado en: %s%n", args[2]);
+
+        } catch (Exception e) {
+            System.err.println("ERROR: " + e.getMessage());
+            e.printStackTrace();
+            System.exit(1);
         }
     }
 }
