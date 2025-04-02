@@ -7,12 +7,11 @@ import java.io.*;
 import java.util.*;
 
 public class ModificarArff {
-    private static final int REQUIRED_ATTRIBUTES = 1001; // 1000 predictores + 1 clase
-    private static final int PREDICTORS_COUNT = 1000;
-
     public static void main(String[] args) {
         try {
             validateArguments(args);
+            int predictorsCount = Integer.parseInt(args[3]);
+            int requiredAttributes = predictorsCount + 1;
 
             // 1. Cargar datasets
             System.out.println("[1/3] Cargando datasets...");
@@ -21,13 +20,13 @@ public class ModificarArff {
 
             // 2. Normalizar estructura
             System.out.println("\n[2/3] Normalizando estructura...");
-            Instances normalizedTest = normalizeStructure(testData, trainData);
+            Instances normalizedTest = normalizeStructure(testData, trainData, predictorsCount, requiredAttributes);
 
             // 3. Guardar resultado
             System.out.println("\n[3/3] Guardando archivo normalizado...");
             saveDataset(normalizedTest, args[2]);
 
-            printSuccessMessage(normalizedTest, trainData.relationName());
+            printSuccessMessage(normalizedTest, trainData.relationName(), predictorsCount);
 
         } catch (Exception e) {
             handleError(e);
@@ -35,9 +34,9 @@ public class ModificarArff {
     }
 
     private static void validateArguments(String[] args) {
-        if (args.length != 3) {
-            System.err.println("Uso: java ArffNormalizer <train.arff> <test_blind.arff> <output.arff>");
-            System.err.println("Ejemplo: java ArffNormalizer train.arff test_blind.arff test_normalized.arff");
+        if (args.length != 4) {
+            System.err.println("Uso: java ModificarArff <train.arff> <test_blind.arff> <output.arff> <num_predictors>");
+            System.err.println("Ejemplo: java ModificarArff train.arff test_blind.arff test_normalized.arff 500");
             System.exit(1);
         }
     }
@@ -51,25 +50,16 @@ public class ModificarArff {
         return data;
     }
 
-    private static Instances normalizeStructure(Instances testData, Instances trainData) throws Exception {
-        // Mapeo de atributos del test
+    private static Instances normalizeStructure(Instances testData, Instances trainData, int predictorsCount, int requiredAttributes) throws Exception {
         Map<String, Integer> testAttrMap = createAttributeMap(testData);
 
-        // Construir nueva estructura basada en train
         ArrayList<Attribute> newAttributes = new ArrayList<>();
         List<Integer> attrMapping = new ArrayList<>();
 
-        // 1. Agregar predictores (primeros 1000 atributos de train, excluyendo ID y clase)
-        addPredictors(trainData, testAttrMap, newAttributes, attrMapping);
-
-        // 2. Agregar atributo clase
+        addPredictors(trainData, testAttrMap, newAttributes, attrMapping, predictorsCount);
         addClassAttribute(testData, trainData, testAttrMap, newAttributes, attrMapping);
 
-        // Crear dataset normalizado
-        Instances normalized = createNormalizedDataset(trainData.relationName(), newAttributes, testData, attrMapping);
-
-        validateNormalizedDataset(normalized);
-        return normalized;
+        return createNormalizedDataset(trainData.relationName(), newAttributes, testData, attrMapping, requiredAttributes, predictorsCount);
     }
 
     private static Map<String, Integer> createAttributeMap(Instances data) {
@@ -84,10 +74,10 @@ public class ModificarArff {
     }
 
     private static void addPredictors(Instances trainData, Map<String, Integer> testAttrMap,
-                                      ArrayList<Attribute> newAttributes, List<Integer> attrMapping) {
+                                      ArrayList<Attribute> newAttributes, List<Integer> attrMapping, int predictorsCount) {
         int predictorsAdded = 0;
 
-        for (int i = 0; i < trainData.numAttributes() && predictorsAdded < PREDICTORS_COUNT; i++) {
+        for (int i = 0; i < trainData.numAttributes() && predictorsAdded < predictorsCount; i++) {
             String name = trainData.attribute(i).name().toLowerCase();
 
             if (!name.equals("id") && !name.equals("@@class@@")) {
@@ -97,7 +87,7 @@ public class ModificarArff {
                 if (testAttrMap.containsKey(searchName)) {
                     attrMapping.add(testAttrMap.get(searchName));
                 } else {
-                    attrMapping.add(-1); // Atributo faltante
+                    attrMapping.add(-1);
                 }
 
                 newAttributes.add((Attribute) attr.copy());
@@ -105,8 +95,7 @@ public class ModificarArff {
             }
         }
 
-        // Completar con atributos ficticios si es necesario
-        while (predictorsAdded < PREDICTORS_COUNT) {
+        while (predictorsAdded < predictorsCount) {
             newAttributes.add(new Attribute("ficticio_" + (predictorsAdded + 1)));
             attrMapping.add(-1);
             predictorsAdded++;
@@ -124,7 +113,6 @@ public class ModificarArff {
             newAttributes.add((Attribute) testData.attribute(testClassIndex).copy());
             attrMapping.add(testClassIndex);
         } else {
-            // Crear atributo clase con valores missing si no existe
             Attribute classAttr = trainData.attribute(trainData.classIndex());
             newAttributes.add((Attribute) classAttr.copy());
             attrMapping.add(-1);
@@ -134,15 +122,17 @@ public class ModificarArff {
     private static Instances createNormalizedDataset(String relationName,
                                                      ArrayList<Attribute> attributes,
                                                      Instances testData,
-                                                     List<Integer> attrMapping) {
+                                                     List<Integer> attrMapping,
+                                                     int requiredAttributes,
+                                                     int predictorsCount) {
         Instances normalized = new Instances(relationName, attributes, testData.numInstances());
-        normalized.setClassIndex(PREDICTORS_COUNT); // La clase es el último atributo
+        normalized.setClassIndex(predictorsCount);
 
         for (int i = 0; i < testData.numInstances(); i++) {
             Instance original = testData.instance(i);
-            Instance newInst = new DenseInstance(REQUIRED_ATTRIBUTES);
+            Instance newInst = new DenseInstance(requiredAttributes);
 
-            for (int j = 0; j < REQUIRED_ATTRIBUTES; j++) {
+            for (int j = 0; j < requiredAttributes; j++) {
                 int originalPos = attrMapping.get(j);
                 if (originalPos != -1) {
                     newInst.setValue(j, original.value(originalPos));
@@ -150,22 +140,9 @@ public class ModificarArff {
                     newInst.setMissing(j);
                 }
             }
-
             normalized.add(newInst);
         }
-
         return normalized;
-    }
-
-    private static void validateNormalizedDataset(Instances data) throws Exception {
-        if (data.numAttributes() != REQUIRED_ATTRIBUTES) {
-            throw new Exception("Dataset normalizado debe tener exactamente " +
-                    REQUIRED_ATTRIBUTES + " atributos");
-        }
-
-        if (data.classIndex() != PREDICTORS_COUNT) {
-            throw new Exception("Índice de clase incorrecto. Debe ser " + PREDICTORS_COUNT);
-        }
     }
 
     private static void saveDataset(Instances data, String outputPath) throws Exception {
@@ -175,13 +152,13 @@ public class ModificarArff {
         saver.writeBatch();
     }
 
-    private static void printSuccessMessage(Instances normalizedData, String relationName) {
+    private static void printSuccessMessage(Instances normalizedData, String relationName, int predictorsCount) {
         System.out.println("\n✔ Normalización completada exitosamente");
         System.out.println("════════════════════════════════════════");
         System.out.println("• Archivo de salida creado correctamente");
         System.out.println("• Relación: " + relationName);
         System.out.println("• Atributos totales: " + normalizedData.numAttributes());
-        System.out.println("• Predictores: " + PREDICTORS_COUNT);
+        System.out.println("• Predictores: " + predictorsCount);
         System.out.println("• Posición clase: " + normalizedData.classIndex());
         System.out.println("• Instancias procesadas: " + normalizedData.numInstances());
         System.out.println("════════════════════════════════════════");
