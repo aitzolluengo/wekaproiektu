@@ -13,7 +13,7 @@ import weka.filters.unsupervised.instance.Resample;
 
 public class NaiveBayes {
     public static void main(String[] args) throws Exception {
-        if (args.length == 3) {
+        if (args.length == 4) {  // Ahora acepta 4 parámetros (el número de repeticiones)
             DataSource source = new DataSource(args[0]);
             Instances data = source.getDataSet();
             data.setClassIndex(data.numAttributes() - 1);
@@ -24,17 +24,27 @@ public class NaiveBayes {
             nbGuztiak.setUseKernelEstimator(false);
             nbGuztiak.buildClassifier(data);
 
-            //  Repeated Hold-Out 
-            double max = 0;
-            int bestRandomSeed = 0;
-            for (int i = 0; i < 110; i++) {
-                double wfscore = holdOutEgin(i, data).weightedFMeasure();
-                if (wfscore > max) {
-                    max = wfscore;
-                    bestRandomSeed = i;
-                }
+            // Obtener el número de repeticiones desde el argumento
+            int repeticiones = Integer.parseInt(args[3]);
+
+            // Repeated Hold-Out
+            double averageFMeasure = 0;
+            double averagePrecision = 0;
+            double averageRecall = 0;
+            double averageAccuracy = 0;
+
+            for (int j = 0; j < repeticiones; j++) {
+                Evaluation eval = holdOutEgin(j, data);
+                averageFMeasure += eval.weightedFMeasure();
+                averagePrecision += eval.weightedPrecision();
+                averageRecall += eval.weightedRecall();
+                averageAccuracy += eval.pctCorrect();
             }
-            Evaluation eval2 = holdOutEgin(bestRandomSeed, data);
+
+            averageFMeasure /= repeticiones;
+            averagePrecision /= repeticiones;
+            averageRecall /= repeticiones;
+            averageAccuracy /= repeticiones;
 
             // Naive Bayes  Cross-Validation
             weka.classifiers.bayes.NaiveBayes nbCross = new weka.classifiers.bayes.NaiveBayes();
@@ -58,10 +68,11 @@ public class NaiveBayes {
             pw.println();
             pw.println("---------------------------------------------");
             pw.println();
-            pw.println("Hold-Out");
-            pw.println(eval2.toSummaryString());
-            pw.println(eval2.toClassDetailsString());
-            pw.println(eval2.toMatrixString());
+            pw.println("Hold-Out Promedios (Repeticiones: " + repeticiones + ")");
+            pw.println("F-Measure promedio: " + averageFMeasure);
+            pw.println("Precision promedio: " + averagePrecision);
+            pw.println("Recall promedio: " + averageRecall);
+            pw.println("Accuracy promedio: " + averageAccuracy);
             pw.println();
             pw.println("---------------------------------------------");
             pw.println();
@@ -75,7 +86,7 @@ public class NaiveBayes {
             // Gordeko dugu modeloa
             SerializationHelper.write(args[1], nbGuztiak);
         } else {
-            System.out.println("Uso: java -jar NaiveBayes.jar trainPath.arff NBpath.model kalitatea.txt");
+            System.out.println("Uso: java -jar NaiveBayes.jar trainPath.arff NBpath.model kalitatea.txt repeticiones");
             //trainPath input izango da eta NBpath.model eta kalitatea.txt outputak
         }
     }
