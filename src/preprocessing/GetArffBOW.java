@@ -11,7 +11,7 @@ import weka.filters.unsupervised.attribute.Reorder;
 import weka.filters.unsupervised.attribute.StringToWordVector;
 import weka.filters.unsupervised.instance.SparseToNonSparse;
 
-public class TransformData {
+public class GetArffBOW {
 
     /**
      * Aplica StringToWordVector en un dataset ARFF.
