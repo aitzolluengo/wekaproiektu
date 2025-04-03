@@ -11,59 +11,59 @@ import weka.filters.Filter;
 import weka.filters.unsupervised.instance.Randomize;
 import weka.filters.unsupervised.instance.Resample;
 import weka.classifiers.bayes.BayesNet;
-import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.bayes.net.estimate.SimpleEstimator;
-import weka.classifiers.bayes.net.search.SearchAlgorithm;
-import weka.classifiers.bayes.net.search.global.HillClimber;
 import weka.classifiers.bayes.net.search.global.K2;
-import weka.classifiers.bayes.net.search.global.TabuSearch;
+
 
 public class BayesNetwork {
     public static void main(String[] args) throws Exception {
-        if (args.length == 3) {
+        if (args.length == 4) {
             DataSource source = new DataSource(args[0]);
             Instances data = source.getDataSet();
             data.setClassIndex(data.numAttributes() - 1);
 
-            // Entrena un modelo Naive Bayes con todos los datos
-            SimpleEstimator estimator = new SimpleEstimator(); // El estimador óptimo
-            estimator.setAlpha(1.0);  // El valor óptimo de alpha
+            int repeticiones = Integer.parseInt(args[3]);
+
+            // Naive Bayes eredu bat trebatzen du datu guztiekin
+            SimpleEstimator estimator = new SimpleEstimator(); // Estimatzaile optimoa
+            estimator.setAlpha(1.0);  // Alpha balio optimoa
             BayesNet bayesNetwork = new BayesNet();
             bayesNetwork.setSearchAlgorithm(new K2());
             bayesNetwork.setEstimator(estimator);
 
             bayesNetwork.buildClassifier(data);
-            // Guardar el modelo
+            // Eredua gordetzen du
             SerializationHelper.write(args[1], bayesNetwork);
 
             Evaluation eval1 = new Evaluation(data);
             eval1.evaluateModel(bayesNetwork, data);
-            // Hold-Out repeated
-            double max = 0;
-            int bestRandomSeed = 0;
-            for (int i = 0; i < 110; i++) {
-                double wfscore = holdOutEgin(i, data).weightedFMeasure();
-                if (wfscore > max) {
-                    max = wfscore;
-                    bestRandomSeed = i;
-                }
-            }
-            Evaluation eval2 = holdOutEgin(bestRandomSeed, data);
 
-            // Naive Bayes con Cross-Validation
-            BayesNet crossNet = new BayesNet();
-            SimpleEstimator estimator2 = new SimpleEstimator(); // El estimador óptimo
-            estimator.setAlpha(1.0);  // El valor óptimo de alpha
-            crossNet.setSearchAlgorithm(new K2());
-            crossNet.setEstimator(estimator2);
+            // Bayes Network Cross-Validation erabiliz
+            bayesNetwork.buildClassifier(data);
+            Evaluation eval2 = new Evaluation(data);
+            eval2.crossValidateModel(bayesNetwork, data, 10, new Random(1));
 
-            Evaluation eval3 = new Evaluation(data);
-            eval3.crossValidateModel(crossNet, data, 10, new Random(1));
-            // Guardar evaluaciones
+            // Ebaluazioak gordetzen ditu
             PrintWriter pw = new PrintWriter(args[2]);
 
+            // Repeated Hold-Out
+            double averageFMeasure = 0;
+            double averagePrecision = 0;
+            double averageRecall = 0;
+            double averageAccuracy = 0;
 
+            for (int j = 0; j < repeticiones; j++) {
+                Evaluation eval = holdOutEgin(data);
+                averageFMeasure += eval.weightedFMeasure();
+                averagePrecision += eval.weightedPrecision();
+                averageRecall += eval.weightedRecall();
+                averageAccuracy += eval.pctCorrect();
+            }
 
+            averageFMeasure /= repeticiones;
+            averagePrecision /= repeticiones;
+            averageRecall /= repeticiones;
+            averageAccuracy /= repeticiones;
 
             pw.println("KALITATEAREN ESTIMAZIOA:");
             pw.println();
@@ -76,56 +76,60 @@ public class BayesNetwork {
             pw.println();
             pw.println("---------------------------------------------");
             pw.println();
-            pw.println("Hold-Out");
-            pw.println(eval2.toSummaryString());
-            pw.println(eval2.toClassDetailsString());
-            pw.println(eval2.toMatrixString());
+            pw.println("Repeated Hold-Out");
+            pw.println("Batez besteko F-Measure: " + averageFMeasure);
+            pw.println("Batez besteko Precision: " + averagePrecision);
+            pw.println("Batez besteko Recall: " + averageRecall);
+            pw.println("Batez besteko Accuracy: " + averageAccuracy);
             pw.println();
             pw.println("---------------------------------------------");
             pw.println();
             pw.println("10-fold cross-validation");
-            pw.println(eval3.toSummaryString());
-            pw.println(eval3.toClassDetailsString());
-            pw.println(eval3.toMatrixString());
+            pw.println(eval2.toSummaryString());
+            pw.println(eval2.toClassDetailsString());
+            pw.println(eval2.toMatrixString());
 
             pw.close();
-
-
         } else {
-            System.out.println("Uso: java -jar NaiveBayes.jar trainPath.arff NBpath.model kalitatea.txt");
+            System.out.println("Erabilera: java -jar NaiveBayes.jar trainPath.arff NBpath.model kalitatea.txt repeticiones");
         }
     }
 
-    private static Evaluation holdOutEgin(int i, Instances data) throws Exception {
-        // Aleatorizar datos
+    private static Evaluation holdOutEgin(Instances data) throws Exception {
+        // Datuak ausaz ordenatzen ditu
         Randomize filter = new Randomize();
-        filter.setRandomSeed(i);
+        filter.setRandomSeed(new Random().nextInt());
         filter.setInputFormat(data);
         data = Filter.useFilter(data, filter);
 
-        // División en 70% entrenamiento usando Resample
+        // Datuak bi zatitan banatzen ditu: %70 entrenamendurako
         Resample resampleTrain = new Resample();
-        resampleTrain.setRandomSeed(i);
+        resampleTrain.setRandomSeed(new Random().nextInt());
         resampleTrain.setSampleSizePercent(70);
         resampleTrain.setNoReplacement(true);
         resampleTrain.setInputFormat(data);
         Instances train = Filter.useFilter(data, resampleTrain);
 
-        // División en 30% validación usando Resample
+        // %30 balidaziorako
         Resample resampleDev = new Resample();
-        resampleDev.setRandomSeed(i);
+        resampleDev.setRandomSeed(new Random().nextInt());
         resampleDev.setSampleSizePercent(30);
         resampleDev.setNoReplacement(true);
         resampleDev.setInputFormat(data);
         Instances dev = Filter.useFilter(data, resampleDev);
 
-        // Entrenar Naive Bayes con el conjunto de entrenamiento
-        NaiveBayes nb = new NaiveBayes();
-        nb.buildClassifier(train);
+        // Naive Bayes eredu bat trebatzen du datu guztiekin
+        SimpleEstimator estimator = new SimpleEstimator(); // Estimatzaile optimoa
+        estimator.setAlpha(1.0);  // Alpha balio optimoa
+        BayesNet bayesNetworkk = new BayesNet();
+        bayesNetworkk.setSearchAlgorithm(new K2());
+        bayesNetworkk.setEstimator(estimator);
 
-        // Evaluar en el conjunto de validación
+        bayesNetworkk.buildClassifier(train);
+
+        // Eredua balidazio multzoan ebaluatzen du
         Evaluation eval2 = new Evaluation(train);
-        eval2.evaluateModel(nb, dev);
+        eval2.evaluateModel(bayesNetworkk, dev);
 
         return eval2;
     }
