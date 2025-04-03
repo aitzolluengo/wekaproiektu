@@ -1,0 +1,104 @@
+1. PROGRAMA NOLA EXEKUTATU (Egiaztatuta JDK 17+)
+Aurre-baldintzak:
+
+JDK azken bertsioak erabili (Weka 3.8.x-ekin bateragarria).
+
+Errore tipikoa konpontzeko: JDK 9-tik aurrera, exekutatu honela:
+java --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED -jar Programa.jar [parametroak]
+Zergatik?: Wekak islapen-erreflexua (reflection) erabiltzen du, eta JDK modernoetan baimenduta egon behar da.
+
+2. KARPETA NAGUSIAK ETA PROZESUAK
+    A. Preprocess Karpeta
+        1-GetARFF.java
+        Helburua: .txt fitxategiak .arff formatura bihurtzen ditu.
+        Komandoa: java -jar GetArff.jar /path/to/txt/files /output/path/trainGordina.arff
+
+        2- GetArffBow.java (StringToWordVector)
+        Helburua: .arff gordina BOW (Bag-of-Words) edo TF-IDF formatura bihurtzen du.
+        Komandoa:java -jar GetArffBow.jar trainGordina.arff dictionary.txt trainBektoreak.arff [-I] [-N]
+
+        -I: TF-IDF aktibatzeko (defektuz: BOW).
+        -N: Ez-disperso formatura bihurtzeko.
+
+        3-EnsureCompatibility.java
+        Helburua: test_blind.arff train-eko formaturik egokitu.
+        Komandoa:  java -jar EnsureCompatibility.jar test_blind.arff dictionary.txt testBektoreak.arff
+
+        4- FSS.java (Feature Subset Selection)
+        Helburua: Train dataset-eko atributu onenak aukeratzen ditu.
+
+        Komandoa: java -jar FSS.jar trainBektoreak.arff fss.arff dictionary.txt [numAtributos]
+
+        numAtributos: Hautazkoa ().
+
+    B. Sailkatzailea Karpeta
+        1-ParametroenBilaketa.java
+
+        Helburua: Bayes Network edo Naive Bayes-rentzat parametro optimoak bilatzen ditu.
+
+        Komandoa: java -jar ParametroenBilaketa.jar fss.arff parametroak.txt "BayesNetwork"
+        edo java -jar ParametroenBilaketa.jar fss.arff parametroak.txt "Naive Bayes"
+
+        2/3- Naive Bayes.java / BayesNetwork.java
+        Helburua: Modeloa entrenatu eta kalitate-txostena (kalitatea.txt) sortu.
+        Komandoa: java -jar NaiveBayes.jar fss.arff NB.model kalitatea.txt
+
+    C. Iragarpenak Karpeta
+        1- testBlindEguneratu.java
+        Helburua: Test_blind eguneratu train.arff itzuri berdina edukitzeko eta errorik ez emateko.
+        Komandoa: java -jar testBlindEguneratu.jar fss.arff test_bind_ensureCompatibility.arff testBlindEguneratua.arff
+
+        2-Iragarpenak.java
+        Helburua: Test_blind eta modeloarekin iragarpenak sortu.
+        Komandoa: java -jar Iragarpenak.jar fss.model testBlindEguneratua.arff iragarpenak.txt
+
+    D.Moldapenak Karpetan
+        1- devEguneratu.java
+        Helburua: dev eguneratu train.arff itzuri berdina edukitzeko eta kalitatea jakiteko.
+        Komandoa: java -jar devEguneratu.jar fss.arff dev.arff output.arff num_predictors
+
+
+3. ONDOREO-BALDINTAZKOAK (Salbuespenak/Murrizpenak)
+
+Datu-formatuak: .arff soilik (Weka-ren formatua).
+
+Liburutegi-menpekotasunak:
+    Weka 3.8.x (JDK 8+ behar du).
+    Ez du Python edo R-ren menpekotasunik.
+
+Sistema-eragile murrizpenak:
+    Bide luzeak dituzten fitxategiak (C:/...)   onartzen dira . Unix-style (/path/to/file) hobetsi.
+
+4. ADIBIDEA (Exekuzio-osagaiak)
+
+# 1. Preprozesatu train datuak
+    java -jar GetRaw.jar /data/train/txt/ trainGordina.arff
+    java -jar TransformData.jar trainGordina.arff dictionary.txt trainBektoreak.arff -I
+
+# 2. Entrenatu modeloa
+    java -jar FSS.jar trainBektoreak.arff fss.arff dictionary.txt 200
+    java -jar NaiveBayes.jar fss.arff NB.model kalitatea.txt
+
+# 3. Iragarpenak test datuekin
+    java -jar EnsureCompatibility.jar test_blind.arff dictionary.txt testBektoreak.arff
+    java -jar SMOPredictions.jar testBektoreak.arff NB.model predictions.txt
+
+5. OHARRAK
+Errore arruntak:
+    Illegal reflective access: JDK 17+ erabiltzen ari bazara eta flags falta badira.
+    ClassNotFoundException: Weka.jar ez dago classpath-ean.
+    FileNotFoundException: Bide okerrak edo fitxategiak falta dira.
+
+Garapenerako: -Xmx4G erabili memoria handiko dataset-ekin (ej: java -Xmx4G -jar ...).
+
+Falta al dago zerbait?
+JDK bertsio zehatza (adibidez, JDK 11).
+
+Sistema eragile zehatzaren argibideak (adibidez, Windows-en PATH konfigurazioa).
+
+Fitxategi adibideen estruktura (zuk zehaztu dezakezu).
+
+Edozein zalantza edo gehigarri behar izanez gero, esan! 😊
+
+Laburpena: Fitxategi honek programa modu autonomoan exekutatzeko argibide zehatzak ematen ditu, hasi datuak preprozesatutik iragarpenak egiteraino.
+
