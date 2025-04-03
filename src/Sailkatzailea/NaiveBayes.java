@@ -116,6 +116,8 @@ public class NaiveBayes {
 
         // Entrenatu
         weka.classifiers.bayes.NaiveBayes nb = new weka.classifiers.bayes.NaiveBayes();
+        nb.setUseSupervisedDiscretization(false);
+        nb.setUseKernelEstimator(false);
         nb.buildClassifier(train);
 
         // ebaluatu
