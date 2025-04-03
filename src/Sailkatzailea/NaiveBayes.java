@@ -24,7 +24,7 @@ public class NaiveBayes {
             nbGuztiak.setUseKernelEstimator(false);
             nbGuztiak.buildClassifier(data);
 
-            // Obtener el número de repeticiones desde el argumento
+            // Iterazio kopurua lortu
             int repeticiones = Integer.parseInt(args[3]);
 
             // Repeated Hold-Out
