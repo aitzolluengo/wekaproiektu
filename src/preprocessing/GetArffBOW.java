@@ -14,39 +14,39 @@ import weka.filters.unsupervised.instance.SparseToNonSparse;
 public class GetArffBOW {
 
     /**
-     * Aplica StringToWordVector en un dataset ARFF.
-     * Convierte texto en valores numéricos para su uso en modelos de Machine Learning.
+     * StringToWordVector aplikatzen du ARFF dataset batean.
+     * Testua balio numeriko bihurtzen du Machine Learning ereduetan erabiltzeko.
      *
-     * Parámetros:
-     * 1. rawData.arff → Archivo de entrada (texto en bruto)
-     * 2. dictionary.txt → Archivo donde se guardará el diccionario de palabras
-     * 3. transformed.arff → Archivo de salida con los datos procesados
-     * Opcionales:
-     * -I / --tfidf → Activa TF-IDF
-     * -N / --nonsparse → Convierte a formato no disperso (opcional)
+     * Parametroak:
+     * 1. rawData.arff → Sarrerako fitxategia (testu gordina)
+     * 2. dictionary.txt → Hitz-hiztegia gordeko den fitxategia
+     * 3. transformed.arff → Irteerako fitxategia, prozesatutako datuekin
+     * Aukerakoak:
+     * -I / --tfidf → TF-IDF aktibatzen du
+     * -N / --nonsparse → Ez-disperso formatura bihurtzen du (aukerakoa)
      *
-     * @param args los argumentos
-     * @throws Exception si ocurre un error en WEKA
+     * @param args argumentuak
+     * @throws Exception WEKA-n errore bat gertatzen bada
      */
     public static void main(String[] args) throws Exception {
         try {
             if (args.length < 3 || args.length > 5) {
-                System.out.println("Uso: java -jar TransformData.jar rawData.arff dictionary.txt transformed.arff [-I/--tfidf] [-N/--nonsparse]");
+                System.out.println("Erabilera: java -jar TransformData.jar rawData.arff dictionary.txt transformed.arff [-I/--tfidf] [-N/--nonsparse]");
                 return;
             }
 
             List<String> list = Arrays.asList(args);
             boolean tfidf = list.contains("-I") || list.contains("--tfidf");
 
-            // Leer el dataset ARFF de entrada
+            // Sarrerako ARFF dataset-a irakurri
             DataSource dataSource = new DataSource(args[0]);
             Instances data = dataSource.getDataSet();
             if (data.numInstances() == 0) {
-                throw new Exception("El dataset está vacío después de cargarlo.");
+                throw new Exception("Datu multzoa hutsik dago kargatu ondoren.");
             }
-            data.setClassIndex(data.numAttributes() - 1); // La clase es el último atributo
+            data.setClassIndex(data.numAttributes() - 1); // Klasea azken atributua da
 
-            // Configurar el filtro StringToWordVector
+            // StringToWordVector iragazkia konfiguratu
             StringToWordVector filter = new StringToWordVector();
             filter.setInputFormat(data);
             filter.setLowerCaseTokens(true);
@@ -55,24 +55,24 @@ public class GetArffBOW {
             filter.setDictionaryFileToSaveTo(new File(args[1]));
             data = Filter.useFilter(data, filter);
 
-            // Verificar si se debe convertir a formato no disperso (Non-Sparse)
+            // Ez-disperso formatua bihurtu behar den egiaztatu
             if (list.contains("-N") || list.contains("--nonsparse")) {
                 SparseToNonSparse filter2 = new SparseToNonSparse();
                 filter2.setInputFormat(data);
                 data = Filter.useFilter(data, filter2);
             }
 
-            // Reordenar atributos (pone la clase en la última posición)
+            // Atributuak berrantolatu (klasea azken posizioan jartzen du)
             if (data.numAttributes() > 1) {
                 Reorder reorder = new Reorder();
                 reorder.setAttributeIndices("2-last,1");
                 reorder.setInputFormat(data);
                 data = Filter.useFilter(data, reorder);
             } else {
-                System.out.println("⚠️ No se aplica reordenación: solo hay un atributo.");
+                System.out.println("⚠️ Ez da berrantolaketarik aplikatzen: atributu bakarra dago.");
             }
 
-            // Corregir nombres de atributos con caracteres especiales
+            // Karaktere bereziak dituzten atributu izenak zuzendu
             for (int i = 0; i < data.numAttributes(); i++) {
                 String attributeName = data.attribute(i).name();
                 if (attributeName.matches(".*[^a-zA-Z0-9_].*")) {
@@ -80,16 +80,16 @@ public class GetArffBOW {
                 }
             }
 
-            // Guardar el dataset transformado
+            // Eraldatutako datu-multzoa gorde
             String outputFile = args[2];
             ArffSaver saver = new ArffSaver();
             saver.setInstances(data);
             saver.setFile(new File(outputFile));
             saver.writeBatch();
 
-            System.out.println("✅ Transformación completada. Archivo guardado en: " + outputFile);
+            System.out.println("✅ Eraldaketa burututa. Fitxategia hemen gorde da: " + outputFile);
         } catch (Exception e) {
-            System.err.println("❌ Error durante la transformación: " + e.getMessage());
+            System.err.println("❌ Errorea eraldaketan: " + e.getMessage());
             e.printStackTrace();
         }
     }
