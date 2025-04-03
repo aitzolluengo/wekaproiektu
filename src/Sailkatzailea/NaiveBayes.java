@@ -2,7 +2,7 @@ package Sailkatzailea;
 
 import java.io.PrintWriter;
 import java.util.Random;
-import weka.classifiers.bayes.NaiveBayes;
+
 import weka.classifiers.evaluation.Evaluation;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
@@ -11,20 +11,20 @@ import weka.filters.Filter;
 import weka.filters.unsupervised.instance.Randomize;
 import weka.filters.unsupervised.instance.Resample;
 
-public class NaiveBayesModel {
+public class NaiveBayes {
     public static void main(String[] args) throws Exception {
         if (args.length == 3) {
             DataSource source = new DataSource(args[0]);
             Instances data = source.getDataSet();
             data.setClassIndex(data.numAttributes() - 1);
 
-            // Entrena un modelo Naive Bayes con todos los datos
-            NaiveBayes nbGuztiak = new NaiveBayes();
+            // Naive bayes entrenatuko dugu ParametroenBilaketaren datuak kontuan izanda
+            weka.classifiers.bayes.NaiveBayes nbGuztiak = new weka.classifiers.bayes.NaiveBayes();
             nbGuztiak.setUseSupervisedDiscretization(false);
             nbGuztiak.setUseKernelEstimator(false);
             nbGuztiak.buildClassifier(data);
 
-            // Hold-Out repeated
+            //  Repeated Hold-Out 
             double max = 0;
             int bestRandomSeed = 0;
             for (int i = 0; i < 110; i++) {
@@ -36,10 +36,10 @@ public class NaiveBayesModel {
             }
             Evaluation eval2 = holdOutEgin(bestRandomSeed, data);
 
-            // Naive Bayes con Cross-Validation
-            NaiveBayes nbCross = new NaiveBayes();
+            // Naive Bayes  Cross-Validation
+            weka.classifiers.bayes.NaiveBayes nbCross = new weka.classifiers.bayes.NaiveBayes();
 
-            // Guardar evaluaciones
+            // Gordeko dugu
             PrintWriter pw = new PrintWriter(args[2]);
             Evaluation eval1 = new Evaluation(data);
             eval1.evaluateModel(nbGuztiak, data);
@@ -72,21 +72,22 @@ public class NaiveBayesModel {
 
             pw.close();
 
-            // Guardar el modelo
+            // Gordeko dugu modeloa
             SerializationHelper.write(args[1], nbGuztiak);
         } else {
             System.out.println("Uso: java -jar NaiveBayes.jar trainPath.arff NBpath.model kalitatea.txt");
+            //trainPath input izango da eta NBpath.model eta kalitatea.txt outputak
         }
     }
 
     private static Evaluation holdOutEgin(int i, Instances data) throws Exception {
-        // Aleatorizar datos
+        //randomize
         Randomize filter = new Randomize();
         filter.setRandomSeed(i);
         filter.setInputFormat(data);
         data = Filter.useFilter(data, filter);
 
-        // División en 70% entrenamiento usando Resample
+        // Resample erabili 70% entrenamendurako
         Resample resampleTrain = new Resample();
         resampleTrain.setRandomSeed(i);
         resampleTrain.setSampleSizePercent(70);
@@ -94,7 +95,7 @@ public class NaiveBayesModel {
         resampleTrain.setInputFormat(data);
         Instances train = Filter.useFilter(data, resampleTrain);
 
-        // División en 30% validación usando Resample
+        // Resample erabili 30% dev
         Resample resampleDev = new Resample();
         resampleDev.setRandomSeed(i);
         resampleDev.setSampleSizePercent(30);
@@ -102,11 +103,11 @@ public class NaiveBayesModel {
         resampleDev.setInputFormat(data);
         Instances dev = Filter.useFilter(data, resampleDev);
 
-        // Entrenar Naive Bayes con el conjunto de entrenamiento
-        NaiveBayes nb = new NaiveBayes();
+        // Entrenatu
+        weka.classifiers.bayes.NaiveBayes nb = new weka.classifiers.bayes.NaiveBayes();
         nb.buildClassifier(train);
 
-        // Evaluar en el conjunto de validación
+        // ebaluatu
         Evaluation eval2 = new Evaluation(train);
         eval2.evaluateModel(nb, dev);
 
