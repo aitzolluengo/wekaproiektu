@@ -1,0 +1,63 @@
+KALITATEAREN ESTIMAZIOA:
+
+---------------------------------------------
+
+Ebaluazio ez-zintzoa
+
+Correctly Classified Instances        1046               87.1667 %
+Incorrectly Classified Instances       154               12.8333 %
+Kappa statistic                          0.7431
+Mean absolute error                      0.1283
+Root mean squared error                  0.3356
+Relative absolute error                 25.6654 %
+Root relative squared error             67.1358 %
+Total Number of Instances             1200     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0,893    0,151    0,860      0,893    0,876      0,744    0,947     0,946     neg
+                 0,849    0,107    0,885      0,849    0,867      0,744    0,947     0,949     pos
+Weighted Avg.    0,872    0,129    0,872      0,872    0,872      0,744    0,947     0,947     
+
+=== Confusion Matrix ===
+
+   a   b   <-- classified as
+ 545  65 |   a = neg
+  89 501 |   b = pos
+
+
+---------------------------------------------
+
+Hold-Out Promedios (Repeticiones: 10)
+F-Measure promedio: 0.8879778559703329
+Precision promedio: 0.8889551236090891
+Recall promedio: 0.8880555555555555
+Accuracy promedio: 88.80555555555554
+
+---------------------------------------------
+
+10-fold cross-validation
+
+Correctly Classified Instances         976               81.3333 %
+Incorrectly Classified Instances       224               18.6667 %
+Kappa statistic                          0.6264
+Mean absolute error                      0.1878
+Root mean squared error                  0.4108
+Relative absolute error                 37.5774 %
+Root relative squared error             82.1639 %
+Total Number of Instances             1200     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0,826    0,200    0,810      0,826    0,818      0,627    0,897     0,893     neg
+                 0,800    0,174    0,817      0,800    0,808      0,627    0,897     0,899     pos
+Weighted Avg.    0,813    0,187    0,813      0,813    0,813      0,627    0,897     0,896     
+
+=== Confusion Matrix ===
+
+   a   b   <-- classified as
+ 504 106 |   a = neg
+ 118 472 |   b = pos
+
