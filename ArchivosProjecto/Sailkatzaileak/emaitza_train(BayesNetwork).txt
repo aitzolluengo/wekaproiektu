@@ -1,4 +1,0 @@
-Clase minoritaria: 1 Frecuencia: 590
-Best SearchAlgorithm: K2
-Best Alpha: 1.0
-Max Accuracy: 0.7542579075425789

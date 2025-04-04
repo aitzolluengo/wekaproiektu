@@ -1,4 +1,0 @@
-Clase minoritaria: 1 Frecuencia: 590
-Best KernelEstimator: false
-Best Discretization: false
-Max Accuracy: 0.8743718592964824
