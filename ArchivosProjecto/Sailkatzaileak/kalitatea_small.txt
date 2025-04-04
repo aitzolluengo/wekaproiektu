@@ -1,0 +1,82 @@
+KALITATEAREN ESTIMAZIOA:
+
+---------------------------------------------
+
+Ebaluazio ez-zintzoa
+
+Correctly Classified Instances        1034               86.1667 %
+Incorrectly Classified Instances       166               13.8333 %
+Kappa statistic                          0.7233
+Mean absolute error                      0.1513
+Root mean squared error                  0.3353
+Relative absolute error                 30.2596 %
+Root relative squared error             67.0707 %
+Total Number of Instances             1200     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0,864    0,141    0,864      0,864    0,864      0,723    0,938     0,934     neg
+                 0,859    0,136    0,859      0,859    0,859      0,723    0,938     0,941     pos
+Weighted Avg.    0,862    0,138    0,862      0,862    0,862      0,723    0,938     0,937     
+
+=== Confusion Matrix ===
+
+   a   b   <-- classified as
+ 527  83 |   a = neg
+  83 507 |   b = pos
+
+
+---------------------------------------------
+
+Hold-Out
+
+Correctly Classified Instances         324               90      %
+Incorrectly Classified Instances        36               10      %
+Kappa statistic                          0.7999
+Mean absolute error                      0.1146
+Root mean squared error                  0.2909
+Relative absolute error                 22.9178 %
+Root relative squared error             58.1918 %
+Total Number of Instances              360     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0,918    0,118    0,888      0,918    0,903      0,800    0,962     0,958     neg
+                 0,882    0,082    0,913      0,882    0,897      0,800    0,962     0,967     pos
+Weighted Avg.    0,900    0,100    0,900      0,900    0,900      0,800    0,962     0,962     
+
+=== Confusion Matrix ===
+
+   a   b   <-- classified as
+ 167  15 |   a = neg
+  21 157 |   b = pos
+
+
+---------------------------------------------
+
+10-fold cross-validation
+
+Correctly Classified Instances        1021               85.0833 %
+Incorrectly Classified Instances       179               14.9167 %
+Kappa statistic                          0.7016
+Mean absolute error                      0.1608
+Root mean squared error                  0.3472
+Relative absolute error                 32.1678 %
+Root relative squared error             69.4442 %
+Total Number of Instances             1200     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0,851    0,149    0,855      0,851    0,853      0,702    0,930     0,926     neg
+                 0,851    0,149    0,847      0,851    0,849      0,702    0,930     0,932     pos
+Weighted Avg.    0,851    0,149    0,851      0,851    0,851      0,702    0,930     0,929     
+
+=== Confusion Matrix ===
+
+   a   b   <-- classified as
+ 519  91 |   a = neg
+  88 502 |   b = pos
+
